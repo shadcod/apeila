@@ -16,7 +16,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.4",
-    "@react-three/drei": "^10.3.0",
+    "@react-three/drei": "9.56.13",
     "@react-three/fiber": "9.1.2",
     "@tiptap/extension-blockquote": "^2.23.0",
     "@tiptap/extension-bold": "^2.23.0",
