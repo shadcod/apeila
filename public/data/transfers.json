@@ -1,0 +1,26 @@
+[
+  {
+    "id": "TRF-001",
+    "from": "Main Warehouse",
+    "to": "Store #1",
+    "date": "2025-06-10",
+    "status": "In Transit",
+    "itemsCount": 15
+  },
+  {
+    "id": "TRF-002",
+    "from": "Store #2",
+    "to": "Main Warehouse",
+    "date": "2025-06-06",
+    "status": "Completed",
+    "itemsCount": 8
+  },
+  {
+    "id": "TRF-003",
+    "from": "Main Warehouse",
+    "to": "Pop-up Shop",
+    "date": "2025-06-01",
+    "status": "Canceled",
+    "itemsCount": 5
+  }
+]

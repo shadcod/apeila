@@ -1,0 +1,29 @@
+[
+  {
+    "id": "GC-001",
+    "code": "XMAS-2025-001",
+    "customer": "John Doe",
+    "balance": 50,
+    "createdAt": "2025-06-01",
+    "expiresAt": "2025-12-31",
+    "status": "Active"
+  },
+  {
+    "id": "GC-002",
+    "code": "SALE-2025-002",
+    "customer": "N/A",
+    "balance": 0,
+    "createdAt": "2025-05-01",
+    "expiresAt": "2025-06-01",
+    "status": "Expired"
+  },
+  {
+    "id": "GC-003",
+    "code": "NEWYEAR-2025-003",
+    "customer": "Alice Smith",
+    "balance": 30,
+    "createdAt": "2025-06-15",
+    "expiresAt": "2026-01-01",
+    "status": "Disabled"
+  }
+]

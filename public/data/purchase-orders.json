@@ -1,0 +1,23 @@
+[
+  {
+    "id": "PO-001",
+    "vendor": "Samsung Supplier Co.",
+    "date": "2025-06-15",
+    "status": "Pending",
+    "itemsCount": 12
+  },
+  {
+    "id": "PO-002",
+    "vendor": "LG Electronics",
+    "date": "2025-06-12",
+    "status": "Received",
+    "itemsCount": 20
+  },
+  {
+    "id": "PO-003",
+    "vendor": "Sony Distribution",
+    "date": "2025-06-08",
+    "status": "Canceled",
+    "itemsCount": 5
+  }
+]

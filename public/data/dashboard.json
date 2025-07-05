@@ -1,0 +1,36 @@
+{
+  "salesData": [
+    { "name": "Mon", "sales": 400 },
+    { "name": "Tue", "sales": 650 },
+    { "name": "Wed", "sales": 800 },
+    { "name": "Thu", "sales": 700 },
+    { "name": "Fri", "sales": 980 },
+    { "name": "Sat", "sales": 600 },
+    { "name": "Sun", "sales": 720 }
+  ],
+  "ordersByChannel": [
+    { "channel": "Website", "orders": 220 },
+    { "channel": "Mobile App", "orders": 150 },
+    { "channel": "Facebook", "orders": 60 },
+    { "channel": "Instagram", "orders": 45 }
+  ],
+  "customerDistribution": [
+    { "name": "New", "value": 300 },
+    { "name": "Returning", "value": 200 }
+  ],
+  "topProducts": [
+    { "name": "Samsung TV", "sales": 120 },
+    { "name": "Apple iPhone", "sales": 95 },
+    { "name": "Sony Headphones", "sales": 80 },
+    { "name": "Dell Laptop", "sales": 75 },
+    { "name": "Canon Camera", "sales": 60 }
+  ],
+  "totalSales": 12430,
+  "totalOrders": 320,
+  "totalSessions": 5842,
+  "returningCustomersRate": 38,
+  "conversionRate": 4.8,
+  "averageOrderValue": 142.7,
+  "customerSatisfaction": 92,
+  "newCustomers": 87
+}

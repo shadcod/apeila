@@ -1,0 +1,1189 @@
+[
+{
+  "id": 0,
+  "name": "Samsung 55\" UHD 4K Smart TV",
+  "slug": "samsung-55-smart-tv",
+  "img": "/img/product/0.png",
+  "price": 350,
+  "oldPrice": 500,
+  "discountPercentage": 30,
+  "rating": 4.3,
+  "reviewsCount": 150,
+  "category": "electronics",
+  "subcategory": "TV & Home Theater",
+  "brand": "Samsung",
+  "stock": true,
+  "inStockCount": 10,
+  "views": 230,                       
+  "dateAdded": "2025-06-15",         
+  "description": "Samsung 55 Inch UHD 4K Smart TV With Receiver",
+  "descriptionHTML": "<p>Samsung 55 Inch UHD 4K Smart TV With Receiver</p><ul><li>4K Ultra HD Resolution</li><li>High Dynamic Range (HDR)</li></ul>",
+  "features": [
+    "Brand: Samsung",
+    "Model: SAMSUNG 55 Model",
+    "Processor: N/A",
+    "Capacity: Standard",
+    "Type: Default"
+  ],
+  "gallery": [
+    "/img/product/0-1.png",
+    "/img/product/0.png",
+    "/img/product/0.png",
+    "/img/product/0-1.png",
+    "/img/product/0-1.png",
+    "/img/product/0-1.png",
+    "/img/product/0-1.png",
+    "/img/product/0-1.png",
+    "/img/product/0-1.png",
+    "/img/product/0-1.png"
+
+  ],
+  "colors": [
+    { "name": "Rose Gold", "code": "#b76e79", "image": "/img/product/0-1.png" },
+    { "name": "Midnight Blue", "code": "#191970", "image": "/img/product/0.png" },
+    { "name": "Emerald Green", "code": "#50c878", "image": "/img/product/0.png" }
+  ],
+  "sizes": ["43 inch", "50 inch", "55 inch", "65 inch"],
+  "shippingFee": 25.0,
+  "deliveryDate": "2025-06-15",
+  "soldBy": "wetren.com",
+  "giftOption": true,
+  "isNew": true,
+  "isFeatured": false,
+  "tags": ["Samsung", "TV", "Smart", "4K"],
+  "aiGeneratedSummary": "Samsung 55-inch 4K UHD Smart TV with HDR technology, offering a cinematic viewing experience at home.",
+  "seoMeta": {
+    "title": "Samsung 55\" 4K UHD Smart TV - wetren.com",
+    "description": "Buy Samsung 55-inch 4K UHD Smart TV with a 30% discount only on wetren.com",
+    "keywords": ["Samsung TV", "4K TV", "Smart TV", "LED Television"]
+  }
+},
+
+  {
+    "id": 1,
+    "name": "Redmi 13C Dual SIM",
+    "slug": "redmi-13c-dual-sim",
+    "img": "/img/product/1.png",
+    "price": 280,
+    "oldPrice": 400,
+    "discountPercentage": 30,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "mobiles",
+    "subcategory": "Smartphones",
+    "brand": "Redmi",
+    "stock": true,
+    "inStockCount": 15,
+    "description": "Redmi 13C Dual SIM with 6GB RAM",
+    "descriptionHTML": "<p>Redmi 13C هاتف ذكي ثنائي الشريحة مع 6 جيجا بايت من الذاكرة العشوائية.</p>",
+    "features": [
+      "Brand: Redmi",
+      "Model: Redmi 13C Model",
+      "Processor: N/A",
+      "Capacity: Standard",
+      "Type: Default"
+    ],
+    "gallery": [
+      "/img/product/1.png",
+      "/img/product/1.png",
+      "/img/product/1.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" },
+      { "name": "Blue", "code": "#007BFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Redmi", "Phone", "RAM 6GB"],
+    "aiGeneratedSummary": "Redmi 13C smartphone with dual SIM and 6GB RAM, ideal for daily use.",
+    "seoMeta": {
+      "title": "Redmi 13C 6GB RAM - wetren.com",
+      "description": "Buy Redmi 13C dual SIM phone with 6GB RAM at a 30% discount only on wetren.com",
+      "keywords": ["Redmi Phone", "Dual SIM", "6GB RAM"]
+    }
+  },
+  {
+    "id": 2,
+    "name": "Dell Laptop Latitude 5530",
+    "slug": "dell-laptop-latitude",
+    "img": "/img/product/2.png",
+    "price": 400,
+    "oldPrice": 850,
+    "discountPercentage": 53,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Laptops",
+    "brand": "Dell",
+    "stock": true,
+    "inStockCount": 8,
+    "description": "Dell Laptop Latitude 5530 Core i7-1255U 8GB SSD",
+    "descriptionHTML": "<p>Dell Laptop with Intel i7 processor, 8GB RAM, and fast SSD storage.</p>",
+    "features": [
+      "Brand: Dell",
+      "Model: Latitude 5530",
+      "Processor: Intel i5",
+      "Capacity: Standard",
+      "Type: Default"
+    ],
+    "gallery": [
+      "/img/product/2.png",
+      "/img/product/2.png",
+      "/img/product/2.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Dell", "Laptop", "Intel i5"],
+    "aiGeneratedSummary": "Dell Latitude laptop with powerful Intel i5 processor and SSD storage for professional use.",
+    "seoMeta": {
+      "title": "Dell Latitude 5530 Laptop - wetren.com",
+      "description": "Buy Dell Latitude 5530 Laptop with Intel i5 and 8GB RAM at a big discount only on wetren.com",
+      "keywords": ["Dell Laptop", "Latitude", "Intel i5", "SSD Laptop"]
+    }
+  },
+  {
+    "id": 3,
+    "name": "Canon EOS RP Mirrorless Camera",
+    "slug": "canon-eos-rp-mirrorless",
+    "img": "/img/product/3.png",
+    "price": 530,
+    "oldPrice": 1200,
+    "discountPercentage": 55.8,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Cameras",
+    "brand": "Canon",
+    "stock": true,
+    "inStockCount": 5,
+      "views": 50,                       
+  "dateAdded": "2025-07-15",
+    "description": "Canon EOS RP Mirrorless Camera from Canon",
+    "descriptionHTML": "<p>Canon EOS RP Mirrorless Camera with high-resolution sensor and compact design.</p>",
+    "features": [
+      "Brand: Canon",
+      "Model: EOS RP Mirrorless",
+      "Processor: N/A",
+      "Capacity: Standard",
+      "Type: Default"
+    ],
+    "gallery": [
+      "/img/product/3.png",
+      "/img/product/3.png",
+      "/img/product/3.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Canon", "Camera", "Mirrorless"],
+    "aiGeneratedSummary": "Canon EOS RP Mirrorless camera with excellent image quality and portability.",
+    "seoMeta": {
+      "title": "Canon EOS RP Mirrorless Camera - wetren.com",
+      "description": "Buy Canon EOS RP Mirrorless Camera at a big discount only on wetren.com",
+      "keywords": ["Canon Camera", "Mirrorless Camera", "EOS RP"]
+    }
+  },
+  {
+    "id": 4,
+    "name": "OPPO A18 128GB 4GB Glowing Black",
+    "slug": "oppo-a18-glowing-black",
+    "img": "/img/product/4.png",
+    "price": 250,
+    "oldPrice": 380,
+    "discountPercentage": 34.2,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "mobiles",
+    "subcategory": "Smartphones",
+    "brand": "OPPO",
+    "stock": true,
+    "inStockCount": 12,
+    "description": "OPPO A18 128GB 4GB Glowing Black Smartphone",
+    "descriptionHTML": "<p>OPPO A18 smartphone with 128GB storage and glowing black finish.</p>",
+    "features": [
+      "Brand: OPPO",
+      "Model: A18",
+      "Processor: N/A",
+      "Capacity: 128GB Storage",
+      "Type: Smartphone"
+    ],
+    "gallery": [
+      "/img/product/4.png",
+      "/img/product/4.png",
+      "/img/product/4.png"
+    ],
+    "colors": [
+      { "name": "Glowing Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["OPPO", "Smartphone", "128GB"],
+    "aiGeneratedSummary": "OPPO A18 smartphone with 128GB storage and stylish glowing black design.",
+    "seoMeta": {
+      "title": "OPPO A18 128GB Smartphone - wetren.com",
+      "description": "Buy OPPO A18 128GB smartphone at a discounted price only on wetren.com",
+      "keywords": ["OPPO A18", "Smartphone", "128GB Mobile"]
+    }
+  },
+  {
+    "id": 5,
+    "name": "Samsung 27-Inch G55C Odyssey QHD 4k",
+    "slug": "samsung-27-inch-g55c-odyssey",
+    "img": "/img/product/5.png",
+    "price": 280,
+    "oldPrice": 380,
+    "discountPercentage": 26.3,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Monitors",
+    "brand": "Samsung",
+    "stock": true,
+    "inStockCount": 7,
+    "description": "Samsung 27-Inch G55C Odyssey QHD 4k Gaming Monitor",
+    "descriptionHTML": "<p>Gaming monitor with high refresh rate and deep blacks for immersive gameplay.</p>",
+    "features": [
+      "Brand: Samsung",
+      "Model: G55C Odyssey",
+      "Size: 27 Inch",
+      "Resolution: QHD 4K",
+      "Type: Monitor"
+    ],
+    "gallery": [
+      "/img/product/5.png",
+      "/img/product/5.png",
+      "/img/product/5.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Samsung", "Monitor", "QHD", "4K"],
+    "aiGeneratedSummary": "Samsung gaming monitor with QHD 4K resolution for smooth and detailed visuals.",
+    "seoMeta": {
+      "title": "Samsung G55C QHD 4K Monitor - wetren.com",
+      "description": "Buy Samsung 27-inch G55C Odyssey QHD 4K Monitor at a discount on wetren.com",
+      "keywords": ["Samsung Monitor", "QHD", "Gaming Monitor", "4K Display"]
+    }
+  },
+  {
+    "id": 6,
+    "name": "Infinix Smart (Galaxy White, 4GB RAM, 64GB Storage)",
+    "slug": "infinix-smart-galaxy-white",
+    "img": "/img/product/6.png",
+    "price": 220,
+    "oldPrice": 300,
+    "discountPercentage": 26.6,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "mobiles",
+    "subcategory": "Smartphones",
+    "brand": "Infinix",
+    "stock": true,
+    "inStockCount": 9,
+      "views": 221,                       
+      "dateAdded": "2025-06-20",
+    "description": "Infinix Smart (Galaxy White, 4GB RAM, 64GB Storage) Budget Smartphone",
+    "descriptionHTML": "<p>A budget-friendly smartphone with decent specs for everyday use.</p>",
+    "features": [
+      "Brand: Infinix",
+      "Model: Infinix Smart",
+      "RAM: 4GB",
+      "Storage: 64GB",
+      "Color: Galaxy White"
+    ],
+    "gallery": [
+      "/img/product/6.png",
+      "/img/product/6.png",
+      "/img/product/6.png"
+    ],
+    "colors": [
+      { "name": "White", "code": "#FFFFFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Infinix", "Smartphone", "4GB RAM", "64GB Storage"],
+    "aiGeneratedSummary": "Affordable Infinix Smart smartphone with 4GB RAM and 64GB storage in galaxy white.",
+    "seoMeta": {
+      "title": "Infinix Smart Galaxy White - wetren.com",
+      "description": "Buy Infinix Smart smartphone with 4GB RAM and 64GB storage at a great deal!",
+      "keywords": ["Infinix Smartphone", "Galaxy White", "Budget Phone"]
+    }
+  },
+  {
+    "id": 7,
+    "name": "HP Victus Gaming Laptop 8RAM SSD",
+    "slug": "hp-victus-gaming-laptop",
+    "img": "/img/product/7.png",
+    "price": 370,
+    "oldPrice": 650,
+    "discountPercentage": 43.1,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Laptops",
+    "brand": "HP",
+    "stock": true,
+    "inStockCount": 6,
+    "description": "HP Victus Gaming Laptop 8RAM SSD High Performance",
+    "descriptionHTML": "<p>Gaming laptop with powerful performance and dedicated graphics card.</p>",
+    "features": [
+      "Brand: HP",
+      "Model: Victus",
+      "RAM: 8GB",
+      "Storage: SSD",
+      "Type: Gaming Laptop"
+    ],
+    "gallery": [
+      "/img/product/7.png",
+      "/img/product/7.png",
+      "/img/product/7.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["HP", "Laptop", "Gaming", "SSD"],
+    "aiGeneratedSummary": "Powerful HP Victus gaming laptop with 8GB RAM and SSD storage for gamers.",
+    "seoMeta": {
+      "title": "HP Victus Gaming Laptop - wetren.com",
+      "description": "Buy HP Victus Gaming Laptop with 8GB RAM and SSD storage at a discounted price.",
+      "keywords": ["HP Laptop", "Victus", "Gaming", "8GB RAM"]
+    }
+  },
+  {
+    "id": 8,
+    "name": "Xiaomi Redmi 13C Dual SIM 8GB",
+    "slug": "xiaomi-redmi-13c-dual-sim",
+    "img": "/img/product/8.png",
+    "price": 320,
+    "oldPrice": 550,
+    "discountPercentage": 41.8,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "mobiles",
+    "subcategory": "Smartphones",
+    "brand": "Xiaomi",
+    "stock": true,
+    "inStockCount": 10,
+    "views": 214,                       
+    "dateAdded": "2025-08-15",
+    "description": "Xiaomi Redmi 13C Dual SIM 8GB RAM Smartphone",
+    "descriptionHTML": "<p>Xiaomi smartphone with 8GB RAM and dual SIM support for multitasking users.</p>",
+    "features": [
+      "Brand: Xiaomi",
+      "Model: Redmi 13C",
+      "RAM: 8GB",
+      "SIM: Dual",
+      "Type: Smartphone"
+    ],
+    "gallery": [
+      "/img/product/8.png",
+      "/img/product/8.png",
+      "/img/product/8.png",
+      "/img/product/8.png",
+      "/img/product/8.png"
+    ],
+    "colors": [
+      { "name": "Gray", "code": "#808080" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Xiaomi", "Smartphone", "Dual SIM", "8GB RAM"],
+    "aiGeneratedSummary": "Xiaomi Redmi 13C smartphone with 8GB RAM and dual SIM support for advanced users.",
+    "seoMeta": {
+      "title": "Xiaomi Redmi 13C Dual SIM - wetren.com",
+      "description": "Buy Xiaomi Redmi 13C smartphone with 8GB RAM and dual SIM at a discount.",
+      "keywords": ["Xiaomi", "Redmi", "Dual SIM", "8GB RAM"]
+    }
+  },
+  {
+    "id": 9,
+    "name": "Handheld Barcode Scanner 1D/2D/QR Code",
+    "slug": "handheld-barcode-scanner",
+    "img": "/img/product/9.png",
+    "price": 80,
+    "oldPrice": 100,
+    "discountPercentage": 20,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Accessories",
+    "brand": "Handheld",
+    "stock": true,
+    "inStockCount": 20,
+    "description": "Handheld Barcode Scanner 1D/2D/QR Code for retail use",
+    "descriptionHTML": "<p>Barcode scanner for commercial and retail applications with QR code support.</p>",
+    "features": [
+      "Brand: Handheld",
+      "Type: Barcode Scanner",
+      "Supported Types: 1D, 2D, QR Code"
+    ],
+    "gallery": [
+      "/img/product/9.png",
+      "/img/product/9.png",
+      "/img/product/9.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Barcode", "Scanner", "Retail", "QR Code"],
+    "aiGeneratedSummary": "Reliable handheld barcode scanner with support for 1D, 2D, and QR codes.",
+    "seoMeta": {
+      "title": "Handheld Barcode Scanner - wetren.com",
+      "description": "Buy handheld barcode scanner for retail and business use at a special price.",
+      "keywords": ["Barcode Scanner", "QR Code Reader", "Retail Equipment"]
+    }
+  },
+  {
+    "id": 10,
+    "name": "Large Venue building mapping Projector",
+    "slug": "large-venue-building-mapping-projector",
+    "img": "/img/product/10.png",
+    "price": 300,
+    "oldPrice": 470,
+    "discountPercentage": 36.2,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Projectors",
+    "brand": "Large",
+    "stock": true,
+    "inStockCount": 5,
+    "description": "Large Venue building mapping Projector for events and presentations",
+    "descriptionHTML": "<p>Professional projector for large venue mapping and event displays.</p>",
+    "features": [
+      "Brand: Large",
+      "Type: Projector",
+      "Application: Building Mapping",
+      "Use Case: Events"
+    ],
+    "gallery": [
+      "/img/product/10.png",
+      "/img/product/10.png",
+      "/img/product/10.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Projector", "Mapping", "Events", "Building"],
+    "aiGeneratedSummary": "Professional-grade projector designed for building mapping and large-scale events.",
+    "seoMeta": {
+      "title": "Venue Building Mapping Projector - wetren.com",
+      "description": "Buy large venue building mapping projector at a discounted price on wetren.com",
+      "keywords": ["Projector", "Building Mapping", "Event Equipment"]
+    }
+  },
+  {
+    "id": 11,
+    "name": "Infinix Hot 40i (RAM: 4+4GB, 128GB)",
+    "slug": "infinix-hot-40i",
+    "img": "/img/product/11.png",
+    "price": 260,
+    "oldPrice": 390,
+    "discountPercentage": 33.3,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "mobiles",
+    "subcategory": "Smartphones",
+    "brand": "Infinix",
+    "stock": true,
+    "inStockCount": 14,
+    "description": "Infinix Hot 40i Smartphone with 4+4GB RAM and 128GB Storage",
+    "descriptionHTML": "<p>Smartphone with dual 4GB RAM and 128GB storage for multitasking and media.</p>",
+    "features": [
+      "Brand: Infinix",
+      "Model: Hot 40i",
+      "RAM: 4+4GB",
+      "Storage: 128GB",
+      "Type: Smartphone"
+    ],
+    "gallery": [
+      "/img/product/11.png",
+      "/img/product/11.png",
+      "/img/product/11.png"
+    ],
+    "colors": [
+      { "name": "Blue", "code": "#007BFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Infinix", "Smartphone", "Dual RAM", "128GB Storage"],
+    "aiGeneratedSummary": "Infinix Hot 40i smartphone with expandable RAM and ample storage for multimedia lovers.",
+    "seoMeta": {
+      "title": "Infinix Hot 40i Smartphone - wetren.com",
+      "description": "Buy Infinix Hot 40i smartphone with 4+4GB RAM and 128GB storage online.",
+      "keywords": ["Infinix", "Hot 40i", "Smartphone", "Dual RAM"]
+    }
+  },
+  {
+    "id": 12,
+    "name": "HP DeskJet 2710 Printer, All-in-One",
+    "slug": "hp-deskjet-2710-printer",
+    "img": "/img/product/12.png",
+    "price": 370,
+    "oldPrice": 460,
+    "discountPercentage": 19.6,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Printers",
+    "brand": "HP",
+    "stock": true,
+    "inStockCount": 8,
+    "description": "HP DeskJet 2710 Printer, All-in-One for printing, scanning, and copying",
+    "descriptionHTML": "<p>All-in-one printer for home or small office use with wireless connectivity.</p>",
+    "features": [
+      "Brand: HP",
+      "Model: DeskJet 2710",
+      "Functions: Print, Scan, Copy",
+      "Connectivity: Wireless"
+    ],
+    "gallery": [
+      "/img/product/12.png",
+      "/img/product/12.png",
+      "/img/product/12.png"
+    ],
+    "colors": [
+      { "name": "White", "code": "#FFFFFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Printer", "HP", "Wireless", "All-in-One"],
+    "aiGeneratedSummary": "HP DeskJet 2710 all-in-one printer with wireless capabilities for home offices.",
+    "seoMeta": {
+      "title": "HP DeskJet 2710 Printer - wetren.com",
+      "description": "Buy HP DeskJet 2710 all-in-one printer with wireless features at a great price.",
+      "keywords": ["HP Printer", "DeskJet", "All-in-One", "Wireless Printer"]
+    }
+  },
+  {
+    "id": 13,
+    "name": "Fuzzy Logic Rice Cooker DIGITAL-JAR 1.8L 940W – HD4515/67",
+    "slug": "fuzzy-logic-rice-cooker",
+    "img": "/img/product/13.png",
+    "price": 490,
+    "oldPrice": 650,
+    "discountPercentage": 24.6,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "appliances",
+    "subcategory": "Kitchen Appliances",
+    "brand": "Fuzzy",
+    "stock": true,
+    "inStockCount": 7,
+    "description": "Fuzzy Logic Rice Cooker DIGITAL-JAR 1.8L 940W – HD4515/67",
+    "descriptionHTML": "<p>Smart rice cooker with fuzzy logic technology for perfect cooking results.</p>",
+    "features": [
+      "Brand: Fuzzy",
+      "Model: HD4515/67",
+      "Capacity: 1.8L",
+      "Power: 940W",
+      "Technology: Fuzzy Logic"
+    ],
+    "gallery": [
+      "/img/product/13.png",
+      "/img/product/13.png",
+      "/img/product/13.png"
+    ],
+    "colors": [
+      { "name": "White", "code": "#FFFFFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Rice Cooker", "Fuzzy Logic", "Kitchen Appliance"],
+    "aiGeneratedSummary": "Fuzzy Logic rice cooker with digital control and precise cooking technology.",
+    "seoMeta": {
+      "title": "Fuzzy Logic Rice Cooker - wetren.com",
+      "description": "Buy Fuzzy Logic rice cooker with digital jar and smart cooking settings.",
+      "keywords": ["Rice Cooker", "Fuzzy Logic", "Kitchen Appliance", "Digital Jar"]
+    }
+  },
+  {
+    "id": 14,
+    "name": "Sencor STS 5070SS Electric Toaster for Four Slices",
+    "slug": "sencor-sts-5070ss-electric-toaster",
+    "img": "/img/product/14.png",
+    "price": 340,
+    "oldPrice": 700,
+    "discountPercentage": 51.4,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "appliances",
+    "subcategory": "Kitchen Appliances",
+    "brand": "Sencor",
+    "stock": true,
+    "inStockCount": 10,
+    "description": "Sencor STS 5070SS Electric Toaster for Four Slices",
+    "descriptionHTML": "<p>Electric toaster for four slices with even toasting and automatic shut-off.</p>",
+    "features": [
+      "Brand: Sencor",
+      "Model: STS 5070SS",
+      "Slices: 4",
+      "Features: Automatic Shut-Off"
+    ],
+    "gallery": [
+      "/img/product/14.png",
+      "/img/product/14.png",
+      "/img/product/14.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Toaster", "Sencor", "Kitchen Appliance", "Four Slices"],
+    "aiGeneratedSummary": "Sencor electric toaster for four slices with modern design and auto shut-off feature.",
+    "seoMeta": {
+      "title": "Sencor Four Slice Toaster - wetren.com",
+      "description": "Buy Sencor STS 5070SS four slice electric toaster with auto shut-off feature.",
+      "keywords": ["Toaster", "Sencor", "Four Slices", "Electric Toaster"]
+    }
+  },
+  {
+    "id": 15,
+    "name": "Infinix Smart 6 Plus (Miracle Black)",
+    "slug": "infinix-smart-6-plus-miracle-black",
+    "img": "/img/product/15.png",
+    "price": 240,
+    "oldPrice": 480,
+    "discountPercentage": 50,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "mobiles",
+    "subcategory": "Smartphones",
+    "brand": "Infinix",
+    "stock": true,
+    "inStockCount": 11,
+    "description": "Infinix Smart 6 Plus (Miracle Black) Budget Smartphone",
+    "descriptionHTML": "<p>Budget smartphone with long battery life and large display for entertainment.</p>",
+    "features": [
+      "Brand: Infinix",
+      "Model: Smart 6 Plus",
+      "Color: Miracle Black",
+      "Battery: Long Life",
+      "Display: Large"
+    ],
+    "gallery": [
+      "/img/product/15.png",
+      "/img/product/15.png",
+      "/img/product/15.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Infinix", "Smartphone", "Budget", "Smart 6 Plus"],
+    "aiGeneratedSummary": "Infinix Smart 6 Plus smartphone with large screen and long-lasting battery.",
+    "seoMeta": {
+      "title": "Infinix Smart 6 Plus Smartphone - wetren.com",
+      "description": "Buy Infinix Smart 6 Plus smartphone with large screen and big battery.",
+      "keywords": ["Infinix", "Smart 6 Plus", "Smartphone", "Long Battery"]
+    }
+  },
+  {
+    "id": 16,
+    "name": "Washing Machine 959 Series 8kg Senator Aqua SX, Silver",
+    "slug": "washing-machine-959-series-senator-aqua-sx",
+    "img": "/img/product/16.png",
+    "price": 600,
+    "oldPrice": 850,
+    "discountPercentage": 29.4,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "appliances",
+    "subcategory": "Home Appliances",
+    "brand": "Washing",
+    "stock": true,
+    "inStockCount": 4,
+    "description": "Washing Machine 959 Series 8kg Senator Aqua SX, Silver",
+    "descriptionHTML": "<p>High-capacity washing machine with energy-efficient operation and multiple wash programs.</p>",
+    "features": [
+      "Brand: Washing",
+      "Series: 959",
+      "Capacity: 8kg",
+      "Color: Silver",
+      "Type: Front Load"
+    ],
+    "gallery": [
+      "/img/product/16.png",
+      "/img/product/16.png",
+      "/img/product/16.png"
+    ],
+    "colors": [
+      { "name": "Silver", "code": "#C0C0C0" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Washing Machine", "Senator Aqua", "8kg", "Silver"],
+    "aiGeneratedSummary": "Washing machine with 8kg capacity and eco-friendly washing programs.",
+    "seoMeta": {
+      "title": "Washing Machine 959 Series - wetren.com",
+      "description": "Buy Washing Machine 959 Series with 8kg capacity and energy-saving features.",
+      "keywords": ["Washing Machine", "959 Series", "8kg", "Energy Efficient"]
+    }
+  },
+  {
+    "id": 17,
+    "name": "HIKVISION PTZ Camera 4K Outdoo",
+    "slug": "hikvision-ptz-camera-4k-outdoor",
+    "img": "/img/product/17.png",
+    "price": 185,
+    "oldPrice": 380,
+    "discountPercentage": 51.3,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Security Cameras",
+    "brand": "HIKVISION",
+    "stock": true,
+    "inStockCount": 6,
+    "description": "HIKVISION PTZ Camera 4K Outdoor Security Camera",
+    "descriptionHTML": "<p>Outdoor security camera with 4K resolution and pan-tilt-zoom functionality.</p>",
+    "features": [
+      "Brand: HIKVISION",
+      "Type: PTZ Camera",
+      "Resolution: 4K",
+      "Use: Outdoor",
+      "Features: Motion Detection"
+    ],
+    "gallery": [
+      "/img/product/17.png",
+      "/img/product/17.png",
+      "/img/product/17.png"
+    ],
+    "colors": [
+      { "name": "White", "code": "#FFFFFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Security Camera", "PTZ", "4K", "Outdoor"],
+    "aiGeneratedSummary": "HIKVISION PTZ camera with 4K resolution for outdoor security monitoring.",
+    "seoMeta": {
+      "title": "HIKVISION PTZ Security Camera - wetren.com",
+      "description": "Buy HIKVISION PTZ camera with 4K resolution and outdoor durability.",
+      "keywords": ["Security Camera", "HIKVISION", "PTZ", "4K Outdoor Camera"]
+    }
+  },
+  {
+    "id": 18,
+    "name": "OPPO Reno11 5G 256GB 12GB",
+    "slug": "oppo-reno11-5g-256gb-12gb",
+    "img": "/img/product/18.png",
+    "price": 225,
+    "oldPrice": 380,
+    "discountPercentage": 40.8,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "mobiles",
+    "subcategory": "Smartphones",
+    "brand": "OPPO",
+    "stock": true,
+    "inStockCount": 12,
+    "description": "OPPO Reno11 5G 256GB 12GB Smartphone",
+    "descriptionHTML": "<p>Smartphone with 5G support, 256GB storage, and 12GB RAM.</p>",
+    "features": [
+      "Brand: OPPO",
+      "Model: Reno11",
+      "RAM: 12GB",
+      "Storage: 256GB",
+      "Network: 5G"
+    ],
+    "gallery": [
+      "/img/product/18.png",
+      "/img/product/18.png",
+      "/img/product/18.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["OPPO", "Reno11", "5G", "256GB", "12GB RAM"],
+    "aiGeneratedSummary": "OPPO Reno11 5G smartphone with 256GB storage and 12GB RAM for power users.",
+    "seoMeta": {
+      "title": "OPPO Reno11 5G Smartphone - wetren.com",
+      "description": "Buy OPPO Reno11 5G smartphone with 256GB storage and 12GB RAM.",
+      "keywords": ["OPPO", "Reno11", "5G", "256GB", "12GB RAM"]
+    }
+  },
+  {
+    "id": 19,
+    "name": "VIVAX kettle WH-175L with a capacity of 1.7",
+    "slug": "vivax-kettle-wh-175l",
+    "img": "/img/product/19.png",
+    "price": 140,
+    "oldPrice": 380,
+    "discountPercentage": 63.2,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "appliances",
+    "subcategory": "Kitchen Appliances",
+    "brand": "VIVAX",
+    "stock": true,
+    "inStockCount": 15,
+    "description": "VIVAX kettle WH-175L with a capacity of 1.7L",
+    "descriptionHTML": "<p>Electric kettle with 1.7L capacity for quick water boiling and kitchen convenience.</p>",
+    "features": [
+      "Brand: VIVAX",
+      "Model: WH-175L",
+      "Capacity: 1.7L",
+      "Type: Kettle"
+    ],
+    "gallery": [
+      "/img/product/19.png",
+      "/img/product/19.png",
+      "/img/product/19.png"
+    ],
+    "colors": [
+      { "name": "Silver", "code": "#C0C0C0" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Kettle", "VIVAX", "1.7L", "WH-175L"],
+    "aiGeneratedSummary": "VIVAX electric kettle with 1.7L capacity for fast and safe water boiling.",
+    "seoMeta": {
+      "title": "VIVAX 1.7L Kettle - wetren.com",
+      "description": "Buy VIVAX electric kettle with 1.7L capacity at a special price.",
+      "keywords": ["Kettle", "VIVAX", "1.7L", "Electric Kettle"]
+    }
+  },
+  {
+    "id": 20,
+    "name": "Kenstar Ester ABS Plastic 750W Mixer Grinder",
+    "slug": "kenstar-ester-mixer-grinder",
+    "img": "/img/product/20.png",
+    "price": 280,
+    "oldPrice": 330,
+    "discountPercentage": 15.2,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "appliances",
+    "subcategory": "Kitchen Appliances",
+    "brand": "Kenstar",
+    "stock": true,
+    "inStockCount": 9,
+    "description": "Kenstar Ester ABS Plastic 750W Mixer Grinder",
+    "descriptionHTML": "<p>Mixer grinder with 750W motor for efficient grinding and blending.</p>",
+    "features": [
+      "Brand: Kenstar",
+      "Model: Ester",
+      "Motor Power: 750W",
+      "Material: ABS Plastic"
+    ],
+    "gallery": [
+      "/img/product/20.png",
+      "/img/product/20.png",
+      "/img/product/20.png"
+    ],
+    "colors": [
+      { "name": "White", "code": "#FFFFFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Mixer Grinder", "Kenstar", "ABS Plastic", "750W Motor"],
+    "aiGeneratedSummary": "Kenstar Ester mixer grinder with 750W motor for durable and efficient use.",
+    "seoMeta": {
+      "title": "Kenstar Ester Mixer Grinder - wetren.com",
+      "description": "Buy Kenstar Ester mixer grinder with 750W motor and ABS plastic body.",
+      "keywords": ["Mixer Grinder", "Kenstar", "ABS Plastic", "750W Motor"]
+    }
+  },
+  {
+    "id": 21,
+    "name": "Multifunctional Food Processor",
+    "slug": "multifunctional-food-processor",
+    "img": "/img/product/21.png",
+    "price": 350,
+    "oldPrice": 460,
+    "discountPercentage": 23.9,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "appliances",
+    "subcategory": "Kitchen Appliances",
+    "brand": "Multifunctional",
+    "stock": true,
+    "inStockCount": 7,
+    "description": "Multifunctional Food Processor for chopping, slicing, and mixing",
+    "descriptionHTML": "<p>Kitchen food processor with multiple attachments for versatile cooking needs.</p>",
+    "features": [
+      "Brand: Multifunctional",
+      "Type: Food Processor",
+      "Functions: Chopping, Slicing, Mixing",
+      "Attachments: Multiple"
+    ],
+    "gallery": [
+      "/img/product/21.png",
+      "/img/product/21.png",
+      "/img/product/21.png"
+    ],
+    "colors": [
+      { "name": "White", "code": "#FFFFFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Food Processor", "Multifunctional", "Kitchen", "Chopper"],
+    "aiGeneratedSummary": "Multifunctional food processor with multiple functions for easy meal preparation.",
+    "seoMeta": {
+      "title": "Multifunctional Food Processor - wetren.com",
+      "description": "Buy multifunctional food processor with multiple attachments for kitchen use.",
+      "keywords": ["Food Processor", "Multifunctional", "Kitchen Tool", "Chopper"]
+    }
+  },
+  {
+    "id": 22,
+    "name": "Zanussi Washing Machine 8 Kg 1200 RPM",
+    "slug": "zanussi-washing-machine-8kg",
+    "img": "/img/product/22.png",
+    "price": 580,
+    "oldPrice": 950,
+    "discountPercentage": 38.9,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "appliances",
+    "subcategory": "Home Appliances",
+    "brand": "Zanussi",
+    "stock": true,
+    "inStockCount": 5,
+    "description": "Zanussi Washing Machine 8 Kg 1200 RPM Top Load",
+    "descriptionHTML": "<p>Top-load washing machine with 8kg capacity and 1200 RPM spin speed.</p>",
+    "features": [
+      "Brand: Zanussi",
+      "Capacity: 8kg",
+      "Spin Speed: 1200 RPM",
+      "Type: Top Load"
+    ],
+    "gallery": [
+      "/img/product/22.png",
+      "/img/product/22.png",
+      "/img/product/22.png"
+    ],
+    "colors": [
+      { "name": "White", "code": "#FFFFFF" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Washing Machine", "Zanussi", "8kg", "1200 RPM"],
+    "aiGeneratedSummary": "Zanussi washing machine with 8kg capacity and 1200 RPM spin speed for faster drying.",
+    "seoMeta": {
+      "title": "Zanussi 8kg Washing Machine - wetren.com",
+      "description": "Buy Zanussi washing machine with 8kg capacity and 1200 RPM spin speed.",
+      "keywords": ["Washing Machine", "Zanussi", "8kg", "1200 RPM", "Top Load"]
+    }
+  },
+  {
+    "id": 23,
+    "name": "Sharp 42 Lt Electronic Oven Convection",
+    "slug": "sharp-42-lt-electronic-oven-convection",
+    "img": "/img/product/23.png",
+    "price": 400,
+    "oldPrice": 600,
+    "discountPercentage": 33.3,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "appliances",
+    "subcategory": "Home Appliances",
+    "brand": "Sharp",
+    "stock": true,
+    "inStockCount": 6,
+    "description": "Sharp 42 Lt Electronic Oven Convection for home baking",
+    "descriptionHTML": "<p>Convection oven with 42-liter capacity for efficient baking and roasting.</p>",
+    "features": [
+      "Brand: Sharp",
+      "Capacity: 42 Liters",
+      "Type: Convection Oven",
+      "Use: Baking, Roasting"
+    ],
+    "gallery": [
+      "/img/product/23.png",
+      "/img/product/23.png",
+      "/img/product/23.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Oven", "Sharp", "Convection", "42 Liters"],
+    "aiGeneratedSummary": "Sharp convection oven with 42-liter capacity for home baking and roasting.",
+    "seoMeta": {
+      "title": "Sharp 42L Convection Oven - wetren.com",
+      "description": "Buy Sharp convection oven with 42-liter capacity for home use at a special price.",
+      "keywords": ["Oven", "Sharp", "Convection", "42 Liter", "Baking"]
+    }
+  },
+  {
+    "id": 24,
+    "name": "Lenovo Monitor Legion R27fc-30 Gaming Curved",
+    "slug": "lenovo-monitor-legion-gaming-curved",
+    "img": "/img/product/24.png",
+    "price": 300,
+    "oldPrice": 550,
+    "discountPercentage": 45.5,
+    "rating": 4.3,
+    "reviewsCount": 150,
+    "category": "electronics",
+    "subcategory": "Monitors",
+    "brand": "Lenovo",
+    "stock": true,
+    "inStockCount": 8,
+    "description": "Lenovo Monitor Legion R27fc-30 Gaming Curved Monitor",
+    "descriptionHTML": "<p>Gaming monitor with curved display and high refresh rate for immersive gameplay.</p>",
+    "features": [
+      "Brand: Lenovo",
+      "Series: Legion",
+      "Type: Gaming Monitor",
+      "Display: Curved",
+      "Refresh Rate: 144Hz"
+    ],
+    "gallery": [
+      "/img/product/24.png",
+      "/img/product/24.png",
+      "/img/product/24.png"
+    ],
+    "colors": [
+      { "name": "Black", "code": "#000000" }
+    ],
+    "sizes": [],
+    "shippingFee": 25.0,
+    "deliveryDate": "2025-06-15",
+    "soldBy": "wetren.com",
+    "giftOption": true,
+    "isNew": true,
+    "isFeatured": false,
+    "tags": ["Monitor", "Lenovo", "Gaming", "Curved", "Legion"],
+    "aiGeneratedSummary": "Lenovo Legion R27fc-30 curved gaming monitor with 144Hz refresh rate for smooth gaming.",
+    "seoMeta": {
+      "title": "Lenovo Legion Curved Monitor - wetren.com",
+      "description": "Buy Lenovo Legion curved gaming monitor with 144Hz refresh rate at a great price.",
+      "keywords": ["Monitor", "Lenovo", "Gaming", "Curved", "144Hz"]
+    }
+  }
+]
