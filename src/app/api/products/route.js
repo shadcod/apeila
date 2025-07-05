@@ -1,14 +1,11 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-
-export const config = {
-  api: {
-    bodyParser: false, // لإدارة تحميل الملفات عبر formidable أو غيره
-  },
-};
-
 import formidable from 'formidable';
+
+// ✅ App Router config
+export const runtime = 'nodejs'; // أو 'edge' لو حابب
+export const dynamic = 'force-dynamic'; // يضمن عدم التخزين المؤقت
 
 // دالة مساعدة لإنشاء مجلد إذا لم يكن موجودًا
 async function ensureDirExists(dir) {
@@ -59,7 +56,7 @@ export async function POST(req) {
         // حفظ الملف في المجلد النهائي
         await fs.writeFile(newFilePath, data);
 
-        // رابط الرفع النهائي للاستخدام في الواجهة (public path)
+        // رابط الرفع النهائي للاستخدام في الواجهة
         const publicUrl = `/uploads/${productSlug}/${subFolder}/${newFileName}`;
 
         resolve(

@@ -3,11 +3,11 @@ import Footer from '@components/Footer';
 import Cart from '@components/Cart';
 import { AppProvider } from '@context/AppContext';
 import '@styles/globals.css';
-import { Inter } from 'next/font/google';
+/* import { Inter } from 'next/font/google'; */ // ✅ عطل استدعاء الخط مؤقتًا
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-const inter = Inter({ subsets: ['latin'] });
+/* const inter = Inter({ subsets: ['latin'] }); */ // ✅ عطل تهيئة الخط مؤقتًا
 
 export const metadata = {
   title: {
@@ -47,7 +47,7 @@ export default function RootLayout({ children }) {
           referrerPolicy="no-referrer"
         />
       </head>
-      <body className={inter.className}>
+      <body /* className={inter.className} */> {/* ✅ عطّل className */}
         <AppProvider>
           <Header />
           <main>{children}</main>
