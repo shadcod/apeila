@@ -1,22 +1,21 @@
-// src/lib/firebase.js
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
-// إعدادات Firebase الخاصة بمشروعك
+// إعدادات Firebase مأخوذة من متغيرات البيئة
 const firebaseConfig = {
-  apiKey: "AIzaSyDvJnLYGiF3znucSGDzUyDuU1kpwMC0Tpk",
-  authDomain: "apeila-86.firebaseapp.com",
-  projectId: "apeila-86",
-  storageBucket: "apeila-86.appspot.com",
-  messagingSenderId: "608388981694",
-  appId: "1:608388981694:web:b65d7d0d1da8659f950fef",
-  measurementId: "G-0JDTHH83YR",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// التأكد من تهيئة التطبيق مرة واحدة فقط
+// تأكد من تهيئة التطبيق مرة واحدة فقط
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// تهيئة التحليلات لكن فقط على المتصفح (client-side)
+// التهيئة للتحليلات فقط في المتصفح
 let analytics;
 if (typeof window !== "undefined") {
   analytics = getAnalytics(app);
