@@ -1,4 +1,5 @@
-import admin from 'firebase-admin';
+import admin from '../../../lib/firebaseAdmin';
+
 
 if (!admin.apps.length) {
   admin.initializeApp({
