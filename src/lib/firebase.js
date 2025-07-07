@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth"; // ✅ أضف هذه
 
 // إعدادات Firebase من env
 const firebaseConfig = {
@@ -15,6 +16,7 @@ const firebaseConfig = {
 
 // تهيئة التطبيق مرة واحدة فقط
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
 
 // التهيئة للتحليلات في المتصفح فقط
 let analytics;
@@ -25,4 +27,5 @@ if (typeof window !== "undefined") {
 // تهيئة Firestore
 export const db = getFirestore(app);
 
+export { auth };
 export { app, analytics };
