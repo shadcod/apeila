@@ -1,23 +1,30 @@
-import { db } from '@/lib/firebaseAdmin';
-import { deleteDoc, doc } from 'firebase/firestore';
+import admin from '@/lib/firebaseAdmin';
 
-// نستدعي firestoreAdmin (أو firebaseAdmin) بدلاً من JSON
 export async function POST(req) {
   const { ids } = await req.json();
 
   try {
-    // حذف المنتجات واحدًا تلو الآخر من Firestore
+    const db = admin.firestore();
+
     for (const id of ids) {
-      const docRef = doc(db, 'products', id);
-      await deleteDoc(docRef);
+      await db.collection('products').doc(id).delete();
     }
 
     return new Response(JSON.stringify({ message: 'Products deleted successfully' }), {
       status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ message: 'Failed to delete products', error: error.message }), {
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({ message: 'Failed to delete products', error: error.message }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 }
