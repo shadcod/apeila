@@ -4,6 +4,7 @@ import Banners from '@components/Banners';
 import ProductSlider from '@components/ProductSlider';
 import MainSlider from '@components/MainSlider';
 
+
 export default function Home() {
   return (
     <main>

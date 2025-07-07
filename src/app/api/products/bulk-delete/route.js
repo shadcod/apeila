@@ -1,18 +1,16 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { db } from '@/lib/firebaseAdmin';
+import { deleteDoc, doc } from 'firebase/firestore';
 
-const dataFile = path.join(process.cwd(), 'public/data/products.json');
-
+// نستدعي firestoreAdmin (أو firebaseAdmin) بدلاً من JSON
 export async function POST(req) {
   const { ids } = await req.json();
 
   try {
-    const fileData = await fs.readFile(dataFile, 'utf8');
-    const products = JSON.parse(fileData);
-
-    const updated = products.filter((product) => !ids.includes(String(product.id)));
-
-    await fs.writeFile(dataFile, JSON.stringify(updated, null, 2));
+    // حذف المنتجات واحدًا تلو الآخر من Firestore
+    for (const id of ids) {
+      const docRef = doc(db, 'products', id);
+      await deleteDoc(docRef);
+    }
 
     return new Response(JSON.stringify({ message: 'Products deleted successfully' }), {
       status: 200,

@@ -23,6 +23,9 @@ import {
   FaEye,
 } from 'react-icons/fa';
 
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+
 const links = [
   { name: 'Home', path: '/dashboard/home', icon: FaHome, roles: ['admin', 'staff'] },
   { name: 'Orders', path: '/dashboard/orders', icon: FaShoppingCart, roles: ['admin', 'staff'] },
@@ -56,16 +59,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, userRole = 'admin
   useEffect(() => {
     async function fetchProductCount() {
       try {
-        const res = await fetch('/data/products.json');
-        const data = await res.json();
-        const count = Array.isArray(data)
-          ? data.length
-          : Array.isArray(data.products)
-          ? data.products.length
-          : 0;
+        const productsSnapshot = await getDocs(collection(db, 'products'));
+        const count = productsSnapshot.size;
         setProductsCount(count);
       } catch (err) {
-        console.error('Error fetching product count:', err);
+        console.error('Error fetching product count from Firestore:', err);
       }
     }
     fetchProductCount();

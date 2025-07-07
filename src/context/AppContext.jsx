@@ -1,20 +1,22 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { db } from '@/lib/firebase'; // تأكد أن المسار صحيح
+import { collection, getDocs } from 'firebase/firestore';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
+  // 🛒 الحالة (state)
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // حالة فتح/إغلاق السلة
   const [isCartOpen, setIsCartOpen] = useState(false);
+
   const toggleCart = () => setIsCartOpen(prev => !prev);
 
-  // أدوات تخزين محلية
+  // 🔐 لتخزين البيانات في localStorage
   const safeSet = (key, value) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(key, JSON.stringify(value));
@@ -29,21 +31,21 @@ export function AppProvider({ children }) {
     return null;
   };
 
-  // تحميل المنتجات من JSON
+  // 🔥 تحميل المنتجات من Firestore
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('/data/products.json');
-        const data = await res.json();
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setProducts(data);
       } catch (error) {
-        console.error('Failed to load products:', error);
+        console.error('Failed to load products from Firestore:', error);
       }
     };
     fetchProducts();
   }, []);
 
-  // تحميل السلة والمفضلة من localStorage
+  // 🗂️ تحميل cart و favorites من localStorage
   useEffect(() => {
     const savedCart = safeGet('cart');
     const savedFavorites = safeGet('favorites');
@@ -51,11 +53,11 @@ export function AppProvider({ children }) {
     if (savedFavorites) setFavorites(savedFavorites);
   }, []);
 
-  // حفظ تلقائي للسلة والمفضلة
+  // 💾 حفظ cart و favorites في localStorage عند التغيير
   useEffect(() => safeSet('cart', cartItems), [cartItems]);
   useEffect(() => safeSet('favorites', favorites), [favorites]);
 
-  // إضافة للسلة (مع التحقق من اللون والمقاس)
+  // ➕ إضافة منتج إلى السلة
   const addToCart = (product, quantity = 1) => {
     setCartItems((prev) => {
       const existingItem = prev.find(
@@ -77,7 +79,7 @@ export function AppProvider({ children }) {
     });
   };
 
-  // إزالة من السلة
+  // ❌ إزالة منتج من السلة
   const removeFromCart = (product) => {
     setCartItems((prev) =>
       prev.filter(
@@ -91,7 +93,7 @@ export function AppProvider({ children }) {
     );
   };
 
-  // تحديث الكمية
+  // 🔁 تحديث كمية منتج معين
   const updateQuantity = (product, newQty) => {
     setCartItems((prev) =>
       prev.map((item) =>
@@ -104,7 +106,7 @@ export function AppProvider({ children }) {
     );
   };
 
-  // تفعيل زيادة كمية محددة حسب id
+  // ⬆️ زيادة الكمية حسب ID
   const increaseQuantity = (id) => {
     setCartItems((prev) =>
       prev.map((item) =>
@@ -113,7 +115,7 @@ export function AppProvider({ children }) {
     );
   };
 
-  // تفعيل نقصان كمية محددة حسب id
+  // ⬇️ تقليل الكمية حسب ID
   const decreaseQuantity = (id) => {
     setCartItems((prev) =>
       prev.map((item) =>
@@ -124,7 +126,7 @@ export function AppProvider({ children }) {
     );
   };
 
-  // إدارة المفضلة
+  // ❤️ إدارة المفضلة
   const toggleFavorite = (product) => {
     setFavorites((prev) => {
       const exists = prev.some((item) => item.id === product.id);
@@ -137,12 +139,13 @@ export function AppProvider({ children }) {
   const isFavorite = (productId) =>
     favorites.some((item) => item.id === productId);
 
-  // حساب السعر الكلي
+  // 💰 حساب السعر الكلي
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
+  // ✅ نشر كل القيم في الـ context
   return (
     <AppContext.Provider
       value={{

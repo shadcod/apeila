@@ -1,18 +1,27 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 const HomeProducts = () => {
   const [products, setProducts] = useState([]);
   const cart = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('cart')) || [] : [];
 
   useEffect(() => {
-    fetch('/products.json')
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
-      })
-      .catch(err => console.error('خطأ في جلب البيانات:', err));
+    const fetchProducts = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        const productsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProducts(productsData);
+      } catch (err) {
+        console.error('خطأ في جلب البيانات من فايرباس:', err);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const generateProductHTML = (product, isInCart, percentDisc) => (
@@ -32,7 +41,7 @@ const HomeProducts = () => {
       <div className="stars">
         {[...Array(5)].map((_, i) => <i key={i} className="fa-solid fa-star"></i>)}
       </div>
-      <p className="name_product"><a href={`/product/${product.id}`}>{product.name}</a></p>
+      <p className="name_product"><Link href={`/product/${product.id}`}>{product.name}</Link></p>
       <div className="price">
         <p><span>${product.price}</span></p>
         {product.oldPrice && <p className="oldPrice">${product.oldPrice}</p>}

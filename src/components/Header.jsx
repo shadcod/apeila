@@ -6,6 +6,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@context/AppContext'; // عدل المسار حسب بنية مشروعك
 
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+
 export default function Header() {
   const { cartItems, favorites, toggleCart } = useAppContext();
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -48,11 +51,11 @@ export default function Header() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('/data/products.json');
-        const data = await res.json();
-        setProducts(data);
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        const productsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProducts(productsData);
       } catch (error) {
-        console.error('فشل تحميل المنتجات:', error);
+        console.error('فشل تحميل المنتجات من فايرباس:', error);
       }
     };
     fetchProducts();
@@ -118,7 +121,7 @@ export default function Header() {
               type="text"
               name="search"
               id="search"
-              placeholder="search for wetren"
+              placeholder="search for Apeila"
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               autoComplete="off"

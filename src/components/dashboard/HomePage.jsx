@@ -15,6 +15,9 @@ import MostViewedProductsChart from './charts/MostViewedProductsChart';
 import LowStockAlert from './LowStockAlert';
 import ExtraStatsCards from './cards/ExtraStatsCards';
 
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+
 export default function HomePage() {
   const [salesData, setSalesData] = useState([]);
   const [ordersByChannel, setOrdersByChannel] = useState([]);
@@ -27,11 +30,12 @@ export default function HomePage() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const res = await fetch('/data/dashboard.json');
-        const data = await res.json();
-        setSalesData(data.salesData || []);
-        setOrdersByChannel(data.ordersByChannel || []);
-        setCustomerDistribution(data.customerDistribution || []);
+        const dashboardSnapshot = await getDocs(collection(db, 'dashboard'));
+        const dashboardData = dashboardSnapshot.docs.map(doc => doc.data())[0] || {};
+
+        setSalesData(dashboardData.salesData || []);
+        setOrdersByChannel(dashboardData.ordersByChannel || []);
+        setCustomerDistribution(dashboardData.customerDistribution || []);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       }
@@ -39,9 +43,9 @@ export default function HomePage() {
 
     const fetchProductsData = async () => {
       try {
-        const res = await fetch('/data/products.json');
-        const data = await res.json();
-        setProducts(data || []);
+        const productsSnapshot = await getDocs(collection(db, 'products'));
+        const productsData = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProducts(productsData);
       } catch (error) {
         console.error('Failed to load products data:', error);
       }
@@ -49,9 +53,9 @@ export default function HomePage() {
 
     const fetchOrdersData = async () => {
       try {
-        const res = await fetch('/data/products.json');
-        const data = await res.json();
-        setOrders(data || []);
+        const ordersSnapshot = await getDocs(collection(db, 'orders'));
+        const ordersData = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setOrders(ordersData);
       } catch (error) {
         console.error('Failed to load orders data:', error);
       }
@@ -59,9 +63,9 @@ export default function HomePage() {
 
     const fetchCustomersData = async () => {
       try {
-        const res = await fetch('/data/products.json');
-        const data = await res.json();
-        setCustomers(data || []);
+        const customersSnapshot = await getDocs(collection(db, 'customers'));
+        const customersData = customersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setCustomers(customersData);
       } catch (error) {
         console.error('Failed to load customers data:', error);
       }

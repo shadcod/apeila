@@ -10,24 +10,31 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/autoplay'
 
+import { db } from '@/lib/firebase'
+import { collection, getDocs } from 'firebase/firestore'
+
 export default function ProductSlider({ title, category }) {
   const [products, setProducts] = useState([])
   const [swiperInstance, setSwiperInstance] = useState(null)
   const { toggleFavorite, isFavorite, addToCart, cartItems } = useAppContext()
 
   useEffect(() => {
-    fetch('/data/products.json')
-      .then(res => res.json())
-      .then(data => {
+    const fetchProducts = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'products'))
+        let data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+
         if (category === 'sale') {
-          setProducts(data.filter(item => item.oldPrice))
+          data = data.filter(item => item.oldPrice)
         } else {
-          setProducts(data.filter(item => item.category === category))
+          data = data.filter(item => item.category === category)
         }
-      })
-      .catch(error => {
-        console.error('Error loading products:', error)
-      })
+        setProducts(data)
+      } catch (error) {
+        console.error('Error loading products from Firebase:', error)
+      }
+    }
+    fetchProducts()
   }, [category])
 
   const isInCart = (productId) => {

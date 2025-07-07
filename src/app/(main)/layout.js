@@ -2,33 +2,32 @@ import Header from '@components/Header';
 import Footer from '@components/Footer';
 import Cart from '@components/Cart';
 import { AppProvider } from '@context/AppContext';
-import '@styles/globals.css';
-/* import { Inter } from 'next/font/google'; */ // ✅ عطل استدعاء الخط مؤقتًا
+import '@styles/globals.css'; import { Inter } from 'next/font/google';  // ✅ عطل استدعاء الخط مؤقتًا
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-/* const inter = Inter({ subsets: ['latin'] }); */ // ✅ عطل تهيئة الخط مؤقتًا
+ const inter = Inter({ subsets: ['latin'] });  // ✅ عطل تهيئة الخط مؤقتًا
 
 export const metadata = {
   title: {
-    default: 'Wetren.com | Online Shopping Store',
-    template: '%s | Wetren.com',
+    default: 'Apeila.com | Online Shopping Store',
+    template: '%s | Apeila.com',
   },
   description: 'Best online shopping store with a wide variety of products',
   keywords: ['shopping', 'electronics', 'devices', 'clothing', 'shoes', 'accessories'],
-  authors: [{ name: 'Wetren' }],
-  creator: 'Wetren',
-  publisher: 'Wetren',
+  authors: [{ name: 'Apeila' }],
+  creator: 'Apeila',
+  publisher: 'Apeila',
   openGraph: {
-    title: 'Wetren.com | Online Shopping Store',
+    title: 'Apeila.com | Online Shopping Store',
     description: 'Best online shopping store',
-    url: 'https://wetren.com',
-    siteName: 'Wetren',
+    url: 'https://Apeila.com',
+    siteName: 'Apeila',
     images: [{ url: '/img/icon.png' }],
     locale: 'en_US',
     type: 'website',
   },
-  metadataBase: new URL("http://localhost:3000"), // غيّرها إلى https://wetren.com في الإنتاج
+  metadataBase: new URL("http://localhost:3000"), // غيّرها إلى https://Apeila.com في الإنتاج
 };
 
 export default function RootLayout({ children }) {
@@ -47,7 +46,7 @@ export default function RootLayout({ children }) {
           referrerPolicy="no-referrer"
         />
       </head>
-      <body /* className={inter.className} */> {/* ✅ عطّل className */}
+      <body className={inter.className}> {/* ✅ عطّل className */}
         <AppProvider>
           <Header />
           <main>{children}</main>

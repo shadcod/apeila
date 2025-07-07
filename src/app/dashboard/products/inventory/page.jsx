@@ -1,16 +1,21 @@
-// app/dashboard/products/inventory/page.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase'; // عدل المسار حسب مشروعك
 
 export default function InventoryPage() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await fetch('/data/products.json');
-      const data = await res.json();
-      setProducts(Array.isArray(data) ? data : [data]);
+      try {
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProducts(data);
+      } catch (error) {
+        console.error('Failed to load products from Firestore:', error);
+      }
     };
     fetchProducts();
   }, []);

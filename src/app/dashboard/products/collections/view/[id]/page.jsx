@@ -1,72 +1,90 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Image from 'next/image';
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import Image from 'next/image'
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 export default function CollectionDetailsPage() {
-  const { id } = useParams();
-  const [collection, setCollection] = useState(null);
-  const [allProducts, setAllProducts] = useState([]);
-  const [sortBy, setSortBy] = useState('default');
+  const { id } = useParams()
+  const [collectionData, setCollectionData] = useState(null)
+  const [allProducts, setAllProducts] = useState([])
+  const [sortBy, setSortBy] = useState('default')
 
   useEffect(() => {
     const fetchData = async () => {
-      const [productsRes, collectionsRes] = await Promise.all([
-        fetch('/data/products.json'),
-        fetch('/data/collections.json'),
-      ]);
-      const products = await productsRes.json();
-      const collections = await collectionsRes.json();
+      try {
+        // جلب بيانات المجموعة المحددة
+        const collectionRef = doc(db, 'collections', id)
+        const collectionSnap = await getDoc(collectionRef)
 
-      const found = collections.find((col) => col.id == id);
-      if (found) {
-        const linked = products.filter((p) => found.products?.includes(p.id));
-        setCollection({ ...found, linkedProducts: linked });
-        setAllProducts(products);
+        if (!collectionSnap.exists()) {
+          setCollectionData(null)
+          return
+        }
+
+        const collectionInfo = collectionSnap.data()
+
+        // جلب كل المنتجات
+        const productsSnapshot = await getDocs(collection(db, 'products'))
+        const productsList = productsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+
+        // ربط المنتجات اللي موجودة في هذه المجموعة
+        const linked = productsList.filter((p) => collectionInfo.products?.includes(p.id))
+
+        setCollectionData({ ...collectionInfo, linkedProducts: linked })
+        setAllProducts(productsList)
+      } catch (error) {
+        console.error('Error fetching data:', error)
       }
-    };
+    }
 
-    fetchData();
-  }, [id]);
+    if (id) {
+      fetchData()
+    }
+  }, [id])
 
   const sortedProducts = () => {
-    if (!collection?.linkedProducts) return [];
-    const products = [...collection.linkedProducts];
+    if (!collectionData?.linkedProducts) return []
+    const products = [...collectionData.linkedProducts]
 
     if (sortBy === 'price') {
-      return products.sort((a, b) => a.price - b.price);
+      return products.sort((a, b) => a.price - b.price)
     } else if (sortBy === 'rating') {
-      return products.sort((a, b) => b.rating - a.rating);
+      return products.sort((a, b) => b.rating - a.rating)
     }
-    return products;
-  };
+    return products
+  }
 
-  if (!collection) return <div className="p-6">Loading...</div>;
+  if (!collectionData) return <div className="p-6">Loading...</div>
 
   return (
     <div className="p-6 space-y-6 font-sans">
       {/* Header */}
       <div className="flex justify-between items-start flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-heading">{collection.title}</h1>
-          <p className="text-sm text-paragraph mt-1">{collection.description}</p>
+          <h1 className="text-2xl font-bold text-heading">{collectionData.title}</h1>
+          <p className="text-sm text-paragraph mt-1">{collectionData.description}</p>
           <div className="mt-2 text-xs space-x-2">
             <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold 
-              ${collection.status === 'Active' 
+              ${collectionData.status === 'Active' 
                 ? 'bg-green-100 text-green-700' 
                 : 'bg-gray-200 text-gray-600'}`}>
-              {collection.status}
+              {collectionData.status}
             </span>
             <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
-              {collection.collectionType}
+              {collectionData.collectionType}
             </span>
           </div>
         </div>
 
-        {collection.image ? (
+        {collectionData.image ? (
           <Image
-            src={collection.image}
+            src={collectionData.image}
             alt="Collection"
             width={80}
             height={80}
@@ -130,7 +148,7 @@ export default function CollectionDetailsPage() {
                 </td>
               </tr>
             ))}
-            {collection.linkedProducts?.length === 0 && (
+            {collectionData.linkedProducts?.length === 0 && (
               <tr>
                 <td colSpan="5" className="text-center py-6 text-gray-500">
                   This collection doesn’t have any linked products yet.
@@ -148,5 +166,5 @@ export default function CollectionDetailsPage() {
         </button>
       </div>
     </div>
-  );
+  )
 }

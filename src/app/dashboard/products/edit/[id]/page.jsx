@@ -1,27 +1,27 @@
 // 📄 src/app/dashboard/products/edit/[id]/page.jsx
+'use client'
 
-import ProductEditorForm from '@/components/dashboard/product-editor/ProductEditorForm';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { notFound } from 'next/navigation';
+import ProductEditorForm from '@/components/dashboard/product-editor/ProductEditorForm'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
+import { notFound } from 'next/navigation'
 
 export default async function Page({ params }) {
-  const id = parseInt(params.id, 10);
+  const id = params.id
 
-  if (isNaN(id)) {
-    // إذا المعرف غير صالح (ليس رقم)
-    notFound();
+  if (!id) {
+    notFound()
   }
 
-  const filePath = path.join(process.cwd(), 'public', 'data', 'products.json');
-  const file = await fs.readFile(filePath, 'utf-8');
-  const products = JSON.parse(file);
+  // جلب المنتج من Firestore
+  const docRef = doc(db, 'products', id)
+  const docSnap = await getDoc(docRef)
 
-  const product = products.find((p) => p.id === id);
-
-  if (!product) {
-    notFound();
+  if (!docSnap.exists()) {
+    notFound()
   }
 
-  return <ProductEditorForm initialProduct={product} />;
+  const product = { id: docSnap.id, ...docSnap.data() }
+
+  return <ProductEditorForm initialProduct={product} />
 }

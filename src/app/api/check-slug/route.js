@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
-export const dynamic = 'force-dynamic';  // <== هذا السطر مهم جدًا
+export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   try {
@@ -20,18 +20,16 @@ export async function GET(req) {
       });
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'data', 'products.json');
-    if (!fs.existsSync(filePath)) {
-      return new Response(JSON.stringify({ exists: false }), { status: 200 });
-    }
+    const q = query(collection(db, 'products'), where('slug', '==', slug));
+    const querySnapshot = await getDocs(q);
 
-    const fileData = fs.readFileSync(filePath, 'utf-8');
-    const products = JSON.parse(fileData);
-    const exists = products.some((p) => p.slug === slug);
+    const exists = !querySnapshot.empty;
 
     return new Response(JSON.stringify({ exists }), { status: 200 });
   } catch (error) {
     console.error('Error checking slug:', error);
-    return new Response(JSON.stringify({ message: 'Server error while checking slug' }), { status: 500 });
+    return new Response(JSON.stringify({ message: 'Server error while checking slug' }), {
+      status: 500,
+    });
   }
 }

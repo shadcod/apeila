@@ -3,6 +3,8 @@
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@components/ProductCard';
 import { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase'; // تأكد من مسار استدعاء db الصحيح
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -15,8 +17,8 @@ export default function SearchPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch('/data/products.json');
-        const data = await res.json();
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setProducts(data);
         setLoading(false);
       } catch (err) {
