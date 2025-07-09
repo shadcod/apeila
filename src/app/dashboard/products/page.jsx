@@ -9,6 +9,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import AddProductButton from '@/components/dashboard/product-table/AddProductButton';
 import ConfirmDeleteModal from '@/components/dashboard/product-table/ConfirmDeleteModal';
 import { STATUS_FILTERS } from '@/constants/product';
+import { getAllProducts } from '@/lib/productsService'; // ✅ استدعاء الخدمة الجديدة
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -26,11 +27,10 @@ export default function ProductsPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch('/data/products.json');
-        const data = await res.json();
-        setProducts(Array.isArray(data) ? data : data.products || []);
+        const data = await getAllProducts(); // ✅ جلب المنتجات من فايرباس
+        setProducts(data);
       } catch (error) {
-        console.error('Failed to load products:', error);
+        console.error('Failed to load products from Firebase:', error);
       } finally {
         setLoading(false);
       }
@@ -211,7 +211,7 @@ export default function ProductsPage() {
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <Image src={product.img} alt={product.name} width={50} height={50} className="object-contain rounded-md border shadow-sm" />
+                    <Image src={product.gallery?.[0] || '/placeholder.png'} alt={product.name} width={50} height={50} className="object-contain rounded-md border shadow-sm" />
                   </td>
                   <td
                     className="px-4 py-3 text-heading font-medium cursor-pointer hover:underline"
