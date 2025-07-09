@@ -1,10 +1,7 @@
-'use client'
-
 import ProductEditorForm from '@/components/dashboard/product-editor/ProductEditorForm'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { notFound } from 'next/navigation'
-// import LoadingSkeleton from '@/components/dashboard/product-editor/LoadingSkeleton'  // جاهز للاستخدام
 
 export default async function Page({ params }) {
   const id = params.id
