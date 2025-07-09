@@ -1,16 +1,74 @@
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
+
 export async function POST(request) {
   try {
     const newProduct = await request.json();
 
+    const {
+      name,
+      slug,
+      price,
+      oldPrice,
+      discountPercentage,
+      category,
+      subcategory,
+      brand,
+      stock,
+      inStockCount,
+      description,
+      gallery,
+      features,
+      sizes,
+      colors,
+      tags,
+      shippingFee,
+      isNew,
+      isFeatured,
+      sku,
+      barcode,
+    } = newProduct;
+
     const productWithMeta = {
-      ...newProduct,
+      name: name || '',
+      slug: slug || '',
+      price: price || 0,
+      oldPrice: oldPrice || 0,
+      discountPercentage: discountPercentage || 0,
+      category: category || '',
+      subcategory: subcategory || '',
+      brand: brand || '',
+      stock: stock ?? true,
+      inStockCount: inStockCount || 0,
+      description: description || '',
+      gallery: gallery || [],
+      features: features || [],
+      sizes: sizes || [],
+      colors: colors || [],
+      tags: tags || [],
+      shippingFee: shippingFee || 0,
+      isNew: isNew ?? false,
+      isFeatured: isFeatured ?? false,
+      sku: sku || '',
+      barcode: barcode || '',
+      views: 0,
+      rating: 0,
+      reviewsCount: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      published: false, // افتراضي غير منشور
-      status: 'draft',  // حالة مسودة
+      published: false,
+      status: 'draft',
     };
 
     const docRef = await addDoc(collection(db, 'products'), productWithMeta);
@@ -19,7 +77,10 @@ export async function POST(request) {
       JSON.stringify({ message: 'Product created successfully!', id: docRef.id }),
       {
         status: 201,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
     );
   } catch (error) {
@@ -28,7 +89,10 @@ export async function POST(request) {
       JSON.stringify({ message: 'Server error while creating product' }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
     );
   }

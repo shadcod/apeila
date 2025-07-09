@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Loading from '@/app/(main)/loading';
+import { productSchema } from '@/schemas/productSchema';
+
 import ProductTitleInput from '@/components/dashboard/product-editor/ProductTitleInput';
 import ProductDescriptionEditor from '@/components/dashboard/product-editor/ProductDescriptionEditor';
 import ProductMediaUploader from '@/components/dashboard/product-editor/ProductMediaUploader';
@@ -10,6 +13,9 @@ import ProductColorsEditor from '@/components/dashboard/product-editor/ProductCo
 import ProductSEOEditor from '@/components/dashboard/product-editor/ProductSEOEditor';
 
 export default function ProductEditorForm({ initialProduct }) {
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
   const [title, setTitle] = useState(initialProduct?.name || '');
   const [tempTitle, setTempTitle] = useState(initialProduct?.name || '');
   const [isEditingTitleField, setIsEditingTitleField] = useState(false);
@@ -47,9 +53,7 @@ export default function ProductEditorForm({ initialProduct }) {
     if (media.length > 0) {
       const urls = media.map(file => URL.createObjectURL(file));
       setMediaUrls(urls);
-      return () => {
-        urls.forEach(url => URL.revokeObjectURL(url));
-      };
+      return () => urls.forEach(url => URL.revokeObjectURL(url));
     }
   }, [media]);
 
@@ -74,16 +78,11 @@ export default function ProductEditorForm({ initialProduct }) {
     }
   }, [title, isSlugTouched]);
 
+  const generateSlug = (text) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+
   const handleSlugChange = (e) => {
     setSlug(e.target.value);
     setIsSlugTouched(true);
-  };
-
-  const generateSlug = (text) => {
-    return text
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]+/g, '');
   };
 
   const handleGenerateSEO = () => {
@@ -91,13 +90,7 @@ export default function ProductEditorForm({ initialProduct }) {
     const titleSEO = `${title} | Buy Online from ${brand} - Best Deals`;
     const descSEO = `Get ${title} from ${brand} in ${category}. Features: ${featureList}. Order now with fast delivery and best price!`;
     const keywordsSEO = [title, brand, category, 'buy', 'best price', 'discount', ...features.split('\n').filter(Boolean)];
-
-    setSeoMeta({
-      title: titleSEO,
-      description: descSEO,
-      keywords: keywordsSEO,
-    });
-
+    setSeoMeta({ title: titleSEO, description: descSEO, keywords: keywordsSEO });
     const newSlug = generateSlug(title);
     setSlug(newSlug);
     setIsSlugTouched(false);
@@ -127,8 +120,8 @@ export default function ProductEditorForm({ initialProduct }) {
       category,
       brand,
       features: features.split('\n').filter(Boolean),
-      sizes: sizes.split(',').map((s) => s.trim()).filter(Boolean),
-      tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+      sizes: sizes.split(',').map(s => s.trim()).filter(Boolean),
+      tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       gallery: mediaUrls,
       youtubeLink,
       aiGeneratedSummary: aiSummary,
@@ -144,6 +137,19 @@ export default function ProductEditorForm({ initialProduct }) {
       isFeatured,
     };
 
+    const validation = productSchema.safeParse(productData);
+    if (!validation.success) {
+      const formErrors = {};
+      validation.error.errors.forEach(err => {
+        formErrors[err.path[0]] = err.message;
+      });
+      setErrors(formErrors);
+      alert('❌ Please fix validation errors before saving.');
+      return;
+    }
+
+    setErrors({});
+    setLoading(true);
     try {
       const res = await fetch(`/api/products/update/${initialProduct.id}`, {
         method: 'POST',
@@ -159,8 +165,12 @@ export default function ProductEditorForm({ initialProduct }) {
     } catch (err) {
       console.error('Error saving product:', err);
       alert('❌ Error saving product!');
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) return <Loading />;
 
   return (
     <div className="max-w-3xl mx-auto bg-gray-50 p-4 rounded shadow" style={{ fontFeatureSettings: '"lnum"', fontFamily: 'Inter, sans-serif' }}>
@@ -183,11 +193,10 @@ export default function ProductEditorForm({ initialProduct }) {
         }}
       />
 
+      {errors.name && <p className="text-red-500">{errors.name}</p>}
+
       <ProductDescriptionEditor description={description} setDescription={setDescription} />
-
       <ProductMediaUploader media={media} setMedia={setMedia} gallery={initialProduct?.gallery || []} setMediaUrls={setMediaUrls} />
-
-      {/* ✅ رفع قسم الألوان مباشرة أسفل الميديا */}
       <ProductColorsEditor colors={colors} setColors={setColors} />
 
       <div className="mb-4">

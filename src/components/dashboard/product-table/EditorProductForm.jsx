@@ -9,6 +9,8 @@ import ProductMetaFields from '@/components/dashboard/product-editor/ProductMeta
 import ProductColorsEditor from '@/components/dashboard/product-editor/ProductColorsEditor';
 import ProductSEOEditor from '@/components/dashboard/product-editor/ProductSEOEditor';
 
+import { productSchema } from '@/schemas/productSchema'; // استيراد الـ Zod schema
+
 export default function EditorProductForm({ initialProduct }) {
   const [title, setTitle] = useState(initialProduct?.name || '');
   const [tempTitle, setTempTitle] = useState(initialProduct?.name || '');
@@ -135,6 +137,7 @@ export default function EditorProductForm({ initialProduct }) {
   const margin = price && costPerItem ? ((profit / Number(price)) * 100).toFixed(2) : 0;
 
   const handleSave = async () => {
+    // جمع بيانات المنتج للتحقق والإرسال
     const productData = {
       name: title,
       slug,
@@ -164,6 +167,14 @@ export default function EditorProductForm({ initialProduct }) {
       isFeatured,
     };
 
+    // تحقق باستخدام Zod
+    try {
+      productSchema.parse(productData);
+    } catch (error) {
+      alert(`Validation Error: ${error.errors ? error.errors.map(e => e.message).join(', ') : error.message}`);
+      return; // توقف عن الإرسال لو التحقق فشل
+    }
+
     try {
       const res = await fetch('/api/products/upload', {
         method: 'POST',
@@ -183,7 +194,10 @@ export default function EditorProductForm({ initialProduct }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-gray-50 p-4 rounded shadow" style={{ fontFeatureSettings: '"lnum"', fontFamily: 'Inter, sans-serif' }}>
+    <div
+      className="max-w-3xl mx-auto bg-gray-50 p-4 rounded shadow"
+      style={{ fontFeatureSettings: '"lnum"', fontFamily: 'Inter, sans-serif' }}
+    >
       <h1 className="text-2xl font-bold mb-4">{title}</h1>
 
       <ProductTitleInput
@@ -211,7 +225,12 @@ export default function EditorProductForm({ initialProduct }) {
 
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">YouTube Video Link</label>
-        <input type="text" value={youtubeLink} onChange={(e) => setYoutubeLink(e.target.value)} className="w-full border rounded p-2" />
+        <input
+          type="text"
+          value={youtubeLink}
+          onChange={(e) => setYoutubeLink(e.target.value)}
+          className="w-full border rounded p-2"
+        />
       </div>
 
       <ProductPricingFields
@@ -249,23 +268,58 @@ export default function EditorProductForm({ initialProduct }) {
       </div>
 
       <div className="mb-4">
-        <label htmlFor="inStockCount" className="block text-sm font-medium mb-1">Stock Count</label>
-        <input type="number" id="inStockCount" value={inStockCount} onChange={(e) => setInStockCount(Number(e.target.value))} className="w-full border rounded p-2" min={0} />
+        <label htmlFor="inStockCount" className="block text-sm font-medium mb-1">
+          Stock Count
+        </label>
+        <input
+          type="number"
+          id="inStockCount"
+          value={inStockCount}
+          onChange={(e) => setInStockCount(Number(e.target.value))}
+          className="w-full border rounded p-2"
+          min={0}
+        />
       </div>
 
       <div className="mb-4">
-        <label htmlFor="shippingFee" className="block text-sm font-medium mb-1">Shipping Fee ($)</label>
-        <input type="number" id="shippingFee" value={shippingFee} onChange={(e) => setShippingFee(Number(e.target.value))} className="w-full border rounded p-2" min={0} step={0.01} />
+        <label htmlFor="shippingFee" className="block text-sm font-medium mb-1">
+          Shipping Fee ($)
+        </label>
+        <input
+          type="number"
+          id="shippingFee"
+          value={shippingFee}
+          onChange={(e) => setShippingFee(Number(e.target.value))}
+          className="w-full border rounded p-2"
+          min={0}
+          step={0.01}
+        />
       </div>
 
       <div className="mb-4">
-        <label htmlFor="deliveryDate" className="block text-sm font-medium mb-1">Delivery Date</label>
-        <input type="date" id="deliveryDate" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} className="w-full border rounded p-2" />
+        <label htmlFor="deliveryDate" className="block text-sm font-medium mb-1">
+          Delivery Date
+        </label>
+        <input
+          type="date"
+          id="deliveryDate"
+          value={deliveryDate}
+          onChange={(e) => setDeliveryDate(e.target.value)}
+          className="w-full border rounded p-2"
+        />
       </div>
 
       <div className="mb-4">
-        <label htmlFor="soldBy" className="block text-sm font-medium mb-1">Sold By</label>
-        <input type="text" id="soldBy" value={soldBy} onChange={(e) => setSoldBy(e.target.value)} className="w-full border rounded p-2" />
+        <label htmlFor="soldBy" className="block text-sm font-medium mb-1">
+          Sold By
+        </label>
+        <input
+          type="text"
+          id="soldBy"
+          value={soldBy}
+          onChange={(e) => setSoldBy(e.target.value)}
+          className="w-full border rounded p-2"
+        />
       </div>
 
       <div className="mb-4 flex items-center gap-2">
@@ -299,7 +353,9 @@ export default function EditorProductForm({ initialProduct }) {
       />
 
       <div className="flex gap-2">
-        <button onClick={handleSave} className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Add Product</button>
+        <button onClick={handleSave} className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+          Add Product
+        </button>
       </div>
     </div>
   );
