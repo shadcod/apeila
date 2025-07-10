@@ -19,112 +19,83 @@ addButton.onclick = async () => {
   try {
     console.log("🔎 زر الإضافة تم الضغط عليه!");
 
-    const titleEl = document.querySelector('h1[data-pl="product-title"]') || document.querySelector('h1.product-title-text') || document.querySelector('h1.product-title') || document.querySelector('h1');
-    const priceEl = document.querySelector('.product-price-value') || document.querySelector('.product-price-current') || document.querySelector('.product-price');
-    const imageEls = document.querySelectorAll('.images-view-item img, .images-view-list img');
-    const colorEls = document.querySelectorAll('.sku-property-item img');
-    const sizeEls = document.querySelectorAll('.sku-property-text');
-    const descEl = document.querySelector('.product-detail-full') || document.querySelector('.product-description') || document.querySelector('#product-description');
+    const titleEl = 
+      document.querySelector('h1[data-pl="product-title"]') ||
+      document.querySelector('h1.product-title-text') ||
+      document.querySelector('h1.product-title') ||
+      document.querySelector('h1') ||
+      document.querySelector('[class*="title"]');
+
+    const priceEl = 
+      document.querySelector('.product-price-value') ||
+      document.querySelector('.product-price-current') ||
+      document.querySelector('.product-price') ||
+      document.querySelector('[class*="price"]');
+
+    const imageEls = document.querySelectorAll(
+      '.images-view-item img, .images-view-list img, .sku-image-list img, [class*="image"] img'
+    );
+
+    const colorEls = document.querySelectorAll(
+      '.sku-property-item img, .sku-property-color img, [class*="sku"] img'
+    );
+
+    const sizeEls = document.querySelectorAll(
+      '.sku-property-text, .sku-property-item-text, [class*="sku"] span'
+    );
+
+    const descEl = 
+      document.querySelector('.product-detail-full') ||
+      document.querySelector('.product-description') ||
+      document.querySelector('#product-description') ||
+      document.querySelector('[class*="description"]') ||
+      document.querySelector('[data-pl="product-desc"]');
 
     const videoEl = document.querySelector('video source') || document.querySelector('video') || document.querySelector('iframe');
     const videoUrl = videoEl ? (videoEl.src || videoEl.getAttribute('src') || videoEl.getAttribute('data-src')) : '';
 
-    const ratingEl = document.querySelector('.overview-rating-average');
+    const ratingEl = document.querySelector('.overview-rating-average') || document.querySelector('[class*="rating"]');
     const rating = ratingEl ? parseFloat(ratingEl.innerText.trim()) : 0;
 
+    const shippingEl = document.querySelector('.product-shipping-info') || document.querySelector('[class*="shipping"]') || document.querySelector('[class*="delivery"]');
+    const shippingInfo = shippingEl ? shippingEl.innerText.trim() : '';
+
     if (!titleEl || !priceEl || imageEls.length === 0) {
-      alert("❌ لم يتم العثور على معلومات المنتج! تأكد أنك في صفحة منتج علي إكسبرس.");
+      alert("❌ لم يتم العثور على معلومات المنتج! تأكد من أنك في صفحة منتج علي إكسبرس.");
       return;
     }
 
     const title = titleEl.innerText.trim();
-    const rawPrice = priceEl.innerText.replace(/[\n\r]+/g, '').trim();
-    const cleanPrice = parseFloat(rawPrice.replace(/[^0-9.]/g, '')) || 0;
+    const price = priceEl.innerText.replace(/[\n\r]+/g, '').trim();
 
     const images = Array.from(imageEls).map(img => {
-      const src = img.getAttribute('src') || img.getAttribute('data-src') || '';
+      const src = img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('srcset') || '';
       return src.replace(/_50x50\.jpg$/, '_640x640.jpg').split(' ')[0];
     }).filter(src => src);
 
     const colors = Array.from(colorEls).map(img => {
-      const src = img.getAttribute('src') || img.getAttribute('data-src') || '';
-      return {
-        name: "Color",
-        code: "#000000", // لا يوجد كود حقيقي بالأصل في علي إكسبرس، إذا تحب لاحقاً تستخرج اللون من اسم الخيار
-        image: src.replace(/_50x50\.jpg$/, '_640x640.jpg').split(' ')[0],
-      };
-    }).filter(c => c.image);
+      const src = img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('srcset') || '';
+      return src.replace(/_50x50\.jpg$/, '_640x640.jpg').split(' ')[0];
+    }).filter(src => src);
 
     const sizes = Array.from(sizeEls).map(el => el.innerText.trim()).filter(text => text);
 
-    let description = descEl ? descEl.innerHTML.trim() : "";
-    // إزالة iframes أو أزرار زائدة
-    description = description.replace(/<iframe.*?<\/iframe>/g, '').replace(/<button.*?<\/button>/g, '');
+    const description = descEl ? descEl.innerHTML.trim() : '';
 
-    // توليد slug
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
-    // تجهيز الكائن النهائي
     const productData = {
       name: title,
-      slug: slug,
-      barcode: "NA",
-      brand: "AliExpress",
-      category: "Imported",
-      subcategory: "AliExpress",
-      price: cleanPrice,
-      oldPrice: cleanPrice,
-      discountPercentage: 0,
-      description: description,
-      descriptionHTML: description,
-      specifications: {
-        processor: "",
-        ram: "",
-        storage: "",
-        battery: "",
-        display: "",
-      },
-      gallery: images,
+      price: price,
+      images: images,
       colors: colors,
-      media: {
-        images: images,
-        videos: videoUrl ? [videoUrl] : [],
-      },
-      features: [],
-      options: {
-        warrantyOptions: [
-          { period: "1 year", price: 0 },
-          { period: "2 years", price: 50 }
-        ]
-      },
-      stock: true,
-      inStockCount: 10,
-      rating: rating,
-      reviewsCount: 0,
-      shippingFee: 25,
-      seoMeta: {
-        title: `${title} - Apeila.com`,
-        description: `${title} imported from AliExpress with special offer`,
-        keywords: ["AliExpress", "imported", title],
-      },
-      translations: {
-        en: {
-          name: title,
-          description: "Imported product from AliExpress",
-        },
-        ar: {
-          name: title,
-          description: "منتج مستورد من علي إكسبرس",
-        }
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      views: 0,
-      sourceUrl: window.location.href,
       sizes: sizes,
+      description: description,
+      video: videoUrl,
+      rating: rating,
+      shipping: shippingInfo,
+      sourceUrl: window.location.href,
     };
 
-    // ✅ إنشاء Popup معاينة
+    // إنشاء Popup
     const modal = document.createElement('div');
     modal.style.position = "fixed";
     modal.style.top = "0";
@@ -141,7 +112,7 @@ addButton.onclick = async () => {
     content.style.background = "#fff";
     content.style.padding = "20px";
     content.style.borderRadius = "10px";
-    content.style.width = "250px";
+    content.style.width = "180px";
     content.style.maxHeight = "90%";
     content.style.overflowY = "auto";
     content.style.boxShadow = "0 6px 15px rgba(0,0,0,0.3)";
@@ -149,18 +120,23 @@ addButton.onclick = async () => {
     content.style.textAlign = "center";
 
     let colorsHtml = '';
-    colors.forEach(c => {
-      colorsHtml += `<img src="${c.image}" style="width:28px; height:28px; border-radius:50%; margin:2px; border:1px solid #ddd;" />`;
+    colors.forEach(src => {
+      colorsHtml += `<img src="${src}" style="width:28px; height:28px; border-radius:50%; margin:2px; border:1px solid #ddd;" />`;
     });
 
     content.innerHTML = `
       <h2 style="margin-top:0; color:#333;">معاينة المنتج</h2>
-      <img src="${images[0]}" style="width:150px; height:auto; border-radius:8px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.2);" />
+      <img src="${images[0]}" style="width:120px; height:auto; border-radius:8px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.2);" />
       <strong>الاسم:</strong> <div style="margin-bottom:5px;">${title}</div>
-      <strong>السعر:</strong> $${cleanPrice}<br>
+      <strong>السعر:</strong> ${price}<br>
       <strong>التقييم:</strong> ${rating}<br>
+      <strong>عدد الصور:</strong> ${images.length}<br>
       <strong>الألوان:</strong><div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:5px;">${colorsHtml}</div>
       <strong>عدد الأحجام:</strong> ${sizes.length}<br>
+      <strong>الوصف:</strong>
+      <div style="max-height:100px; overflow-y:auto; border:1px solid #ddd; padding:5px; margin:5px 0; text-align:right;">${description.slice(0, 500)}...</div>
+      <strong>الشحن:</strong> ${shippingInfo}<br>
+      <strong>رابط الفيديو:</strong> <a href="${videoUrl}" target="_blank">مشاهدة</a><br>
       <div style="margin-top: 15px;">
         <button id="sendBtn" style="background-color: #28a745; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">إرسال ✅</button>
         <button id="cancelBtn" style="background-color: #dc3545; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer;">إلغاء ❌</button>
