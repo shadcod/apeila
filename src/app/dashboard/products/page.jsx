@@ -9,7 +9,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import AddProductButton from '@/components/dashboard/product-table/AddProductButton';
 import ConfirmDeleteModal from '@/components/dashboard/product-table/ConfirmDeleteModal';
 import { STATUS_FILTERS } from '@/constants/product';
-import { getAllProducts } from '@/lib/productsService'; // ✅ استدعاء الخدمة الجديدة
+import { getAllProducts } from '@/lib/productsService';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -27,7 +27,7 @@ export default function ProductsPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const data = await getAllProducts(); // ✅ جلب المنتجات من فايرباس
+        const data = await getAllProducts();
         setProducts(data);
       } catch (error) {
         console.error('Failed to load products from Firebase:', error);
@@ -82,7 +82,7 @@ export default function ProductsPage() {
         if (!res.ok) throw new Error();
         setProducts((prev) => prev.filter((p) => p.id !== ids[0]));
         setSelectedIds((prev) => prev.filter((pid) => pid !== ids[0]));
-        toast.success(`Product ${ids[0]} deleted successfully`);
+        toast.success(`Product deleted successfully`);
       } else {
         const res = await fetch(`/api/products/bulk-delete`, {
           method: 'POST',

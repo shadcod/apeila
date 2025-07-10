@@ -87,7 +87,7 @@ export default function ProductColorsEditor({ colors, setColors, productSlug = '
             <input
               type="text"
               placeholder="Image URL"
-              value={color.image.startsWith('blob:') ? '' : color.image}
+              value={(color.image || '').startsWith('blob:') ? '' : (color.image || '')}
               onChange={(e) => updateColorField(idx, 'image', e.target.value)}
               className="text-xs w-full mb-1 border rounded p-1"
             />

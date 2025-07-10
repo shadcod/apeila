@@ -14,7 +14,11 @@ export default function Page() {
   const id = params?.id;
 
   useEffect(() => {
+    console.log("🔎 useParams:", params);
+    console.log("🟢 Product ID:", id);
+
     if (!id) {
+      console.log("❌ No ID provided. Redirecting...");
       router.push('/dashboard/products');
       return;
     }
@@ -22,16 +26,25 @@ export default function Page() {
     async function fetchProduct() {
       try {
         const docRef = doc(db, 'products', id);
+        console.log("📄 docRef path:", docRef.path);
+
         const docSnap = await getDoc(docRef);
 
         if (!docSnap.exists()) {
+          console.log("⚠️ Product not found in Firebase. Redirecting...");
           router.push('/dashboard/products');
           return;
         }
 
-        setProduct({ id: docSnap.id, ...docSnap.data() });
+        // Remove any 'id' field from data to avoid overriding the document ID
+        const data = docSnap.data();
+        delete data.id;
+
+        console.log("✅ Product data from Firebase:", data);
+
+        setProduct({ id: docSnap.id, ...data });
       } catch (error) {
-        console.error('Error fetching product:', error);
+        console.error("💥 Error fetching product:", error);
         router.push('/dashboard/products');
       } finally {
         setLoading(false);
