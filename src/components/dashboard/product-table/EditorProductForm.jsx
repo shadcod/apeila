@@ -1,6 +1,5 @@
-'use client';
-
 import { useState, useEffect } from 'react';
+import Loading from '@/app/(main)/loading';
 import ProductTitleInput from '@/components/dashboard/product-editor/ProductTitleInput';
 import ProductDescriptionEditor from '@/components/dashboard/product-editor/ProductDescriptionEditor';
 import ProductMediaUploader from '@/components/dashboard/product-editor/ProductMediaUploader';
@@ -8,10 +7,13 @@ import ProductPricingFields from '@/components/dashboard/product-editor/ProductP
 import ProductMetaFields from '@/components/dashboard/product-editor/ProductMetaFields';
 import ProductColorsEditor from '@/components/dashboard/product-editor/ProductColorsEditor';
 import ProductSEOEditor from '@/components/dashboard/product-editor/ProductSEOEditor';
+import { productSchema } from '@/schemas/productSchema';
 
-import { productSchema } from '@/schemas/productSchema'; // استيراد الـ Zod schema
+function EditorProductForm({ initialProduct }) {
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [slugLoading, setSlugLoading] = useState(false);
 
-export default function EditorProductForm({ initialProduct }) {
   const [title, setTitle] = useState(initialProduct?.name || '');
   const [tempTitle, setTempTitle] = useState(initialProduct?.name || '');
   const [isEditingTitleField, setIsEditingTitleField] = useState(false);
@@ -57,16 +59,27 @@ export default function EditorProductForm({ initialProduct }) {
 
   useEffect(() => {
     if (!slug) return;
+    
     const checkSlug = async () => {
+      setSlugLoading(true);
       try {
         const res = await fetch(`/api/check-slug?slug=${slug}`);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
         const data = await res.json();
         setIsSlugDuplicate(data.exists);
+        setErrors(prev => ({ ...prev, slug: data.exists ? 'This slug is already taken' : '' }));
       } catch (error) {
         console.error('Error checking slug:', error);
+        setErrors(prev => ({ ...prev, slug: 'Failed to check slug availability' }));
+      } finally {
+        setSlugLoading(false);
       }
     };
-    checkSlug();
+    
+    const timeoutId = setTimeout(checkSlug, 500); // Debounce slug checking
+    return () => clearTimeout(timeoutId);
   }, [slug]);
 
   useEffect(() => {
@@ -76,77 +89,122 @@ export default function EditorProductForm({ initialProduct }) {
     }
   }, [title, isSlugTouched]);
 
-  // ✅ توليد التاجز والـ AI Summary تلقائيًا
+  // AI Summary and tags generation
   useEffect(() => {
     if (!title && !description) return;
 
-    // توليد tags
-    const generatedTags = [
-      ...title.toLowerCase().split(' '),
-      ...description.toLowerCase().split(' ')
-    ]
-      .map((t) => t.replace(/[^\w]/g, '').trim())
-      .filter((t) => t.length > 2)
-      .slice(0, 10);
+    try {
+      // Generate tags
+      const generatedTags = [
+        ...title.toLowerCase().split(' '),
+        ...description.toLowerCase().split(' ')
+      ]
+        .map((t) => t.replace(/[^\w]/g, '').trim())
+        .filter((t) => t.length > 2)
+        .slice(0, 10);
 
-    setTags(generatedTags.join(', '));
+      setTags(generatedTags.join(', '));
 
-    // توليد AI Summary
-    const summary = `${title} - ${description.slice(0, 100)}...`;
-    setAiSummary(summary);
+      // Generate AI Summary
+      const summary = `${title} - ${description.slice(0, 100)}...`;
+      setAiSummary(summary);
+    } catch (error) {
+      console.error('Error generating tags and summary:', error);
+    }
   }, [title, description]);
 
   const handleSlugChange = (e) => {
     setSlug(e.target.value);
     setIsSlugTouched(true);
+    // Clear previous slug errors
+    setErrors(prev => ({ ...prev, slug: '' }));
   };
 
   const generateSlug = (text) => {
-    return text
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]+/g, '');
+    try {
+      return text
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '');
+    } catch (error) {
+      console.error('Error generating slug:', error);
+      return '';
+    }
   };
 
   const handleGenerateSEO = () => {
-    const featureList = features.split('\n').filter(Boolean).join(', ');
-    const titleSEO = `${title} | Buy Online from ${brand} - Best Deals`;
-    const descSEO = `Get ${title} from ${brand} in ${category}. Features: ${featureList}. Order now with fast delivery and best price!`;
-    const keywordsSEO = [title, brand, category, 'buy', 'best price', 'discount', ...features.split('\n').filter(Boolean)];
+    try {
+      const featureList = features.split('\n').filter(Boolean).join(', ');
+      const titleSEO = `${title} | Buy Online from ${brand} - Best Deals`;
+      const descSEO = `Get ${title} from ${brand} in ${category}. Features: ${featureList}. Order now with fast delivery and best price!`;
+      const keywordsSEO = [title, brand, category, 'buy', 'best price', 'discount', ...features.split('\n').filter(Boolean)];
 
-    setSeoMeta({
-      title: titleSEO,
-      description: descSEO,
-      keywords: keywordsSEO,
-    });
+      setSeoMeta({
+        title: titleSEO,
+        description: descSEO,
+        keywords: keywordsSEO,
+      });
 
-    const newSlug = generateSlug(title);
-    setSlug(newSlug);
-    setIsSlugTouched(false);
+      const newSlug = generateSlug(title);
+      setSlug(newSlug);
+      setIsSlugTouched(false);
+    } catch (error) {
+      console.error('Error generating SEO:', error);
+      alert('Failed to generate SEO metadata. Please try again.');
+    }
   };
 
-  const handleCopyLink = () => {
-    const fullLink = `https://apeila.com/product/${slug || 'product-slug'}`;
-    navigator.clipboard.writeText(fullLink).then(() => {
-      setCopySuccess('✅ Link copied!');
+  const handleCopyLink = async () => {
+    try {
+      const fullLink = `https://apeila.com/product/${slug || 'product-slug'}`;
+      await navigator.clipboard.writeText(fullLink);
+      setCopySuccess(' Link copied!');
       setTimeout(() => setCopySuccess(''), 2000);
-    });
+    } catch (error) {
+      console.error('Error copying link:', error);
+      setCopySuccess(' Failed to copy link');
+      setTimeout(() => setCopySuccess(''), 2000);
+    }
   };
 
   const profit = price && costPerItem ? (Number(price) - Number(costPerItem)).toFixed(2) : 0;
   const margin = price && costPerItem ? ((profit / Number(price)) * 100).toFixed(2) : 0;
 
   const handleSave = async () => {
-    // جمع بيانات المنتج للتحقق والإرسال
+    // Clear previous errors
+    setErrors({});
+    
+    // Basic client-side validation
+    if (!title.trim()) {
+      setErrors(prev => ({ ...prev, name: 'Product name is required' }));
+      return;
+    }
+    
+    if (!category.trim()) {
+      setErrors(prev => ({ ...prev, category: 'Category is required' }));
+      return;
+    }
+    
+    if (!price || Number(price) <= 0) {
+      setErrors(prev => ({ ...prev, price: 'Valid price is required' }));
+      return;
+    }
+    
+    if (isSlugDuplicate) {
+      setErrors(prev => ({ ...prev, slug: 'Slug must be unique' }));
+      return;
+    }
+
+    // Construct product data
     const productData = {
       name: title,
       slug,
       description,
       descriptionHTML: description,
       price: Number(price),
-      oldPrice: Number(oldPrice),
-      discountPercentage: Number(discount),
-      costPerItem: Number(costPerItem),
+      oldPrice: Number(oldPrice) || undefined,
+      discountPercentage: Number(discount) || undefined,
+      costPerItem: Number(costPerItem) || undefined,
       category,
       brand,
       features: features.split('\n').filter(Boolean),
@@ -158,8 +216,8 @@ export default function EditorProductForm({ initialProduct }) {
       seoMeta,
       colors,
       stock,
-      inStockCount,
-      shippingFee,
+      inStockCount: Number(inStockCount),
+      shippingFee: Number(shippingFee),
       deliveryDate,
       soldBy,
       giftOption,
@@ -167,14 +225,20 @@ export default function EditorProductForm({ initialProduct }) {
       isFeatured,
     };
 
-    // تحقق باستخدام Zod
-    try {
-      productSchema.parse(productData);
-    } catch (error) {
-      alert(`Validation Error: ${error.errors ? error.errors.map(e => e.message).join(', ') : error.message}`);
-      return; // توقف عن الإرسال لو التحقق فشل
+    // Validate with Zod schema
+    const validation = productSchema.safeParse(productData);
+    if (!validation.success) {
+      const formErrors = {};
+      validation.error.errors.forEach(err => {
+        const fieldName = err.path[0];
+        formErrors[fieldName] = err.message;
+      });
+      setErrors(formErrors);
+      alert('Please fix validation errors before saving.');
+      return;
     }
 
+    setLoading(true);
     try {
       const res = await fetch('/api/products/upload', {
         method: 'POST',
@@ -182,16 +246,26 @@ export default function EditorProductForm({ initialProduct }) {
         body: JSON.stringify(productData),
       });
 
-      if (res.ok) {
-        alert('✅ Product added successfully!');
-      } else {
-        alert('❌ Failed to add product!');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
       }
+
+      const result = await res.json();
+      alert('✅ Product added successfully!');
+      
+      // Reset form or redirect as needed
+      // You might want to add a callback prop to handle post-save actions
+      
     } catch (err) {
       console.error('Error adding product:', err);
-      alert('❌ Error adding product!');
+      alert(`❌ Error adding product: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) return <Loading />;
 
   return (
     <div
@@ -216,10 +290,16 @@ export default function EditorProductForm({ initialProduct }) {
           setIsEditingTitleField(false);
         }}
       />
+      {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
 
       <ProductDescriptionEditor description={description} setDescription={setDescription} />
 
-      <ProductMediaUploader media={media} setMedia={setMedia} gallery={initialProduct?.gallery || []} setMediaUrls={setMediaUrls} />
+      <ProductMediaUploader 
+        media={media} 
+        setMedia={setMedia} 
+        gallery={initialProduct?.gallery || []} 
+        setMediaUrls={setMediaUrls} 
+      />
 
       <ProductColorsEditor colors={colors} setColors={setColors} />
 
@@ -230,6 +310,7 @@ export default function EditorProductForm({ initialProduct }) {
           value={youtubeLink}
           onChange={(e) => setYoutubeLink(e.target.value)}
           className="w-full border rounded p-2"
+          placeholder="https://youtube.com/watch?v=..."
         />
       </div>
 
@@ -245,6 +326,7 @@ export default function EditorProductForm({ initialProduct }) {
         profit={profit}
         margin={margin}
       />
+      {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
 
       <ProductMetaFields
         category={category}
@@ -260,10 +342,16 @@ export default function EditorProductForm({ initialProduct }) {
         aiSummary={aiSummary}
         setAiSummary={setAiSummary}
       />
+      {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
 
-      {/* خيارات إضافية */}
+      {/* Stock Management */}
       <div className="mb-4 flex items-center gap-2">
-        <input type="checkbox" checked={stock} onChange={(e) => setStock(e.target.checked)} id="stock" />
+        <input 
+          type="checkbox" 
+          checked={stock} 
+          onChange={(e) => setStock(e.target.checked)} 
+          id="stock" 
+        />
         <label htmlFor="stock">In Stock</label>
       </div>
 
@@ -279,6 +367,7 @@ export default function EditorProductForm({ initialProduct }) {
           className="w-full border rounded p-2"
           min={0}
         />
+        {errors.inStockCount && <p className="text-red-500 text-sm mt-1">{errors.inStockCount}</p>}
       </div>
 
       <div className="mb-4">
@@ -294,6 +383,7 @@ export default function EditorProductForm({ initialProduct }) {
           min={0}
           step={0.01}
         />
+        {errors.shippingFee && <p className="text-red-500 text-sm mt-1">{errors.shippingFee}</p>}
       </div>
 
       <div className="mb-4">
@@ -323,17 +413,32 @@ export default function EditorProductForm({ initialProduct }) {
       </div>
 
       <div className="mb-4 flex items-center gap-2">
-        <input type="checkbox" checked={giftOption} onChange={(e) => setGiftOption(e.target.checked)} id="giftOption" />
+        <input 
+          type="checkbox" 
+          checked={giftOption} 
+          onChange={(e) => setGiftOption(e.target.checked)} 
+          id="giftOption" 
+        />
         <label htmlFor="giftOption">Gift Option</label>
       </div>
 
       <div className="mb-4 flex items-center gap-2">
-        <input type="checkbox" checked={isNew} onChange={(e) => setIsNew(e.target.checked)} id="isNew" />
+        <input 
+          type="checkbox" 
+          checked={isNew} 
+          onChange={(e) => setIsNew(e.target.checked)} 
+          id="isNew" 
+        />
         <label htmlFor="isNew">New Product</label>
       </div>
 
       <div className="mb-4 flex items-center gap-2">
-        <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} id="isFeatured" />
+        <input 
+          type="checkbox" 
+          checked={isFeatured} 
+          onChange={(e) => setIsFeatured(e.target.checked)} 
+          id="isFeatured" 
+        />
         <label htmlFor="isFeatured">Featured Product</label>
       </div>
 
@@ -351,12 +456,24 @@ export default function EditorProductForm({ initialProduct }) {
         handleSlugChange={handleSlugChange}
         copySuccess={copySuccess}
       />
+      {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug}</p>}
+      {slugLoading && <p className="text-blue-500 text-sm mt-1">Checking slug availability...</p>}
 
       <div className="flex gap-2">
-        <button onClick={handleSave} className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-          Add Product
+        <button 
+          onClick={handleSave} 
+          disabled={loading || slugLoading || isSlugDuplicate}
+          className={`mt-2 px-4 py-2 text-white rounded transition-colors ${
+            loading || slugLoading || isSlugDuplicate
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-green-600 hover:bg-green-700'
+          }`}
+        >
+          {loading ? 'Adding Product...' : 'Add Product'}
         </button>
       </div>
     </div>
   );
 }
+
+export default EditorProductForm;

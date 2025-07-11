@@ -53,6 +53,12 @@ export default function ProductColorsEditor({ colors, setColors, productSlug = '
     };
   }, [colors]);
 
+  const getValidUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('https')) return url;
+    return `/uploads/${url}`;
+  };
+
   return (
     <div className="mb-4">
       <label className="block text-sm font-medium mb-1">Colors</label>
@@ -61,7 +67,7 @@ export default function ProductColorsEditor({ colors, setColors, productSlug = '
           <div key={idx} className="flex flex-col items-center border rounded p-2 w-36">
             {color.image ? (
               <img
-                src={color.image}
+                src={getValidUrl(color.image)}
                 alt={color.name || `Color ${idx}`}
                 className="w-12 h-12 object-cover rounded mb-1"
               />

@@ -40,18 +40,31 @@ addButton.onclick = async () => {
     const imageEls = document.querySelectorAll(
       ".images-view-item img, .images-view-list img, .sku-image-list img, [class*='image'] img"
     );
-    const images = Array.from(imageEls).map(img => {
-      const src = img.getAttribute("src") || img.getAttribute("data-src") || img.getAttribute("srcset") || "";
-      return src.replace(/_50x50\.jpg$/, "_640x640.jpg").split(" ")[0];
-    }).filter(src => src);
+    const images = Array.from(imageEls)
+      .map(img => {
+        let src = img.getAttribute("src") || img.getAttribute("data-src") || img.getAttribute("srcset") || "";
+        src = src.replace(/_50x50\.jpg$/, "_640x640.jpg").split(" ")[0];
+        // تأكد أن الرابط يبدأ بـ http أو https فقط
+        if (src && (src.startsWith("http://") || src.startsWith("https://"))) {
+          return src;
+        }
+        return null;
+      })
+      .filter(src => !!src);
 
     const colorEls = document.querySelectorAll(
       ".sku-property-item img, .sku-property-color img, [class*='sku'] img"
     );
-    const colors = Array.from(colorEls).map(img => {
-      const src = img.getAttribute("src") || img.getAttribute("data-src") || img.getAttribute("srcset") || "";
-      return src.replace(/_50x50\.jpg$/, "_640x640.jpg").split(" ")[0];
-    }).filter(src => src);
+    const colors = Array.from(colorEls)
+      .map(img => {
+        let src = img.getAttribute("src") || img.getAttribute("data-src") || img.getAttribute("srcset") || "";
+        src = src.replace(/_50x50\.jpg$/, "_640x640.jpg").split(" ")[0];
+        if (src && (src.startsWith("http://") || src.startsWith("https://"))) {
+          return src;
+        }
+        return null;
+      })
+      .filter(src => !!src);
 
     const sizeEls = document.querySelectorAll(
       ".sku-property-text, .sku-property-item-text, [class*='sku'] span"
@@ -76,7 +89,7 @@ addButton.onclick = async () => {
     const shippingInfo = shippingEl ? shippingEl.innerText.trim() : "";
 
     if (!title || !priceText || images.length === 0) {
-      alert("❌ لم يتم العثور على معلومات المنتج! تأكد من أنك في صفحة منتج علي إكسبرس.");
+      alert("❌ لم يتم العثور على معلومات المنتج أو الصور! تأكد من أنك في صفحة منتج علي إكسبرس وأن الصور متاحة.");
       return;
     }
 

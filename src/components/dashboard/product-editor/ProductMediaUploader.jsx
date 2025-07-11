@@ -12,7 +12,6 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [newUrl, setNewUrl] = useState('');
 
-  // Editor
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingImageIdx, setEditingImageIdx] = useState(null);
   const [editingImageUrl, setEditingImageUrl] = useState('');
@@ -123,7 +122,6 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
         editorInstanceRef.current = new ImageEditor(editorContainerRef.current, {
           includeUI: {
             loadImage: { path: editingImageUrl, name: 'Selected Image' },
-            theme: {},
             menu: ['crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask', 'filter'],
             initMenu: 'filter',
             uiSize: { width: '1000px', height: '700px' },
@@ -148,12 +146,18 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
     };
   }, [ImageEditor, editorOpen, editingImageUrl]);
 
+  const getValidUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('https')) return url;
+    if (url.startsWith('/img') || url.startsWith('img')) return `/${url.replace(/^\/?/, '')}`;
+    return `/uploads/${url}`;
+  };
+
   return (
     <div>
       <label className="block text-sm font-medium mb-1">Media</label>
 
       <div className="flex gap-4">
-        {/* صورة رئيسية */}
         <div
           className="relative flex-1 min-h-[400px] border rounded bg-white overflow-hidden shadow-inner"
           style={{ position: 'relative', width: '100%', height: '400px' }}
@@ -161,13 +165,13 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
           {previewItems[mainImageIdx] ? (
             previewItems[mainImageIdx].type === 'image' ? (
               <img
-                src={previewItems[mainImageIdx].url}
+                src={getValidUrl(previewItems[mainImageIdx].url)}
                 alt="Main"
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             ) : (
               <video
-                src={previewItems[mainImageIdx].url}
+                src={getValidUrl(previewItems[mainImageIdx].url)}
                 controls
                 className="w-full h-full object-contain"
               />
@@ -198,13 +202,13 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
               >
                 {item.type === 'image' ? (
                   <img
-                    src={item.url}
+                    src={getValidUrl(item.url)}
                     alt={`media-${idx}`}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 ) : (
                   <video
-                    src={item.url}
+                    src={getValidUrl(item.url)}
                     controls
                     className="w-full h-full object-cover"
                   />
@@ -232,7 +236,7 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditingImageIdx(idx);
-                      setEditingImageUrl(item.url);
+                      setEditingImageUrl(getValidUrl(item.url));
                       setEditorOpen(true);
                     }}
                     className="absolute top-1 left-1 bg-gray-800 text-white p-0.5 rounded hover:bg-gray-700 transition"
@@ -271,7 +275,7 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
             <div className="flex flex-col gap-1">
               <input
                 type="text"
-                placeholder="https://apeila/image.jpg"
+                placeholder="https://example.com/image.jpg"
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
                 className="border rounded px-2 py-1 text-xs"
