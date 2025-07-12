@@ -1,29 +1,54 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const filePath = path.join(process.cwd(), 'public', 'data', 'transfers.json');
+import { db } from '@/lib/firebase';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
-    return new Response(JSON.stringify(data), { status: 200 });
+    const querySnapshot = await getDocs(collection(db, 'transfers'));
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return Response.json(
+      successResponse(data, 'Transfers retrieved successfully'),
+      { status: 200 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to read transfers' }), { status: 500 });
+    console.error('Error fetching transfers:', error);
+    return Response.json(
+      errorResponse('Failed to read transfers'),
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req) {
   try {
     const newItem = await req.json();
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
 
-    data.push(newItem);
+    // Basic validation - يمكن تعديلها حسب خصائص الـ transfer المطلوبة
+    if (!newItem.from || !newItem.to || !newItem.amount) {
+      return Response.json(
+        errorResponse('Transfer must have from, to, and amount fields'),
+        { status: 400 }
+      );
+    }
 
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    const docRef = await addDoc(collection(db, 'transfers'), {
+      ...newItem,
+      createdAt: serverTimestamp(),
+    });
+
+    return Response.json(
+      successResponse({ id: docRef.id }, 'Transfer created successfully'),
+      { status: 201 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to save transfer' }), { status: 500 });
+    console.error('Error saving transfer:', error);
+    return Response.json(
+      errorResponse('Failed to save transfer'),
+      { status: 500 }
+    );
   }
 }

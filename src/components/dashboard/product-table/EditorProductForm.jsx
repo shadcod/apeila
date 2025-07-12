@@ -32,7 +32,7 @@ function EditorProductForm({ initialProduct }) {
   const [seoMeta, setSeoMeta] = useState(initialProduct?.seoMeta || { title: '', description: '', keywords: [] });
   const [slug, setSlug] = useState(initialProduct?.slug || '');
   const [isSlugTouched, setIsSlugTouched] = useState(false);
-  const [media, setMedia] = useState([]);
+  const [mediaFiles, setMediaFiles] = useState([]);
   const [mediaUrls, setMediaUrls] = useState(initialProduct?.gallery || []);
   const [youtubeLink, setYoutubeLink] = useState(initialProduct?.youtubeLink || '');
   const [isSlugDuplicate, setIsSlugDuplicate] = useState(false);
@@ -47,26 +47,25 @@ function EditorProductForm({ initialProduct }) {
   const [isNew, setIsNew] = useState(initialProduct?.isNew ?? false);
   const [isFeatured, setIsFeatured] = useState(initialProduct?.isFeatured ?? false);
 
+  // Handle media preview
   useEffect(() => {
-    if (media.length > 0) {
-      const urls = media.map(file => URL.createObjectURL(file));
+    if (mediaFiles.length > 0) {
+      const urls = mediaFiles.map(file => URL.createObjectURL(file));
       setMediaUrls(urls);
       return () => {
         urls.forEach(url => URL.revokeObjectURL(url));
       };
     }
-  }, [media]);
+  }, [mediaFiles]);
 
   useEffect(() => {
     if (!slug) return;
-    
+
     const checkSlug = async () => {
       setSlugLoading(true);
       try {
         const res = await fetch(`/api/check-slug?slug=${slug}`);
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         setIsSlugDuplicate(data.exists);
         setErrors(prev => ({ ...prev, slug: data.exists ? 'This slug is already taken' : '' }));
@@ -77,37 +76,31 @@ function EditorProductForm({ initialProduct }) {
         setSlugLoading(false);
       }
     };
-    
-    const timeoutId = setTimeout(checkSlug, 500); // Debounce slug checking
+
+    const timeoutId = setTimeout(checkSlug, 500);
     return () => clearTimeout(timeoutId);
   }, [slug]);
 
   useEffect(() => {
     if (!isSlugTouched && title) {
-      const autoSlug = generateSlug(title);
-      setSlug(autoSlug);
+      setSlug(generateSlug(title));
     }
   }, [title, isSlugTouched]);
 
-  // AI Summary and tags generation
   useEffect(() => {
     if (!title && !description) return;
 
     try {
-      // Generate tags
       const generatedTags = [
         ...title.toLowerCase().split(' '),
         ...description.toLowerCase().split(' ')
       ]
-        .map((t) => t.replace(/[^\w]/g, '').trim())
-        .filter((t) => t.length > 2)
+        .map(t => t.replace(/[^\w]/g, '').trim())
+        .filter(t => t.length > 2)
         .slice(0, 10);
 
       setTags(generatedTags.join(', '));
-
-      // Generate AI Summary
-      const summary = `${title} - ${description.slice(0, 100)}...`;
-      setAiSummary(summary);
+      setAiSummary(`${title} - ${description.slice(0, 100)}...`);
     } catch (error) {
       console.error('Error generating tags and summary:', error);
     }
@@ -116,18 +109,13 @@ function EditorProductForm({ initialProduct }) {
   const handleSlugChange = (e) => {
     setSlug(e.target.value);
     setIsSlugTouched(true);
-    // Clear previous slug errors
     setErrors(prev => ({ ...prev, slug: '' }));
   };
 
   const generateSlug = (text) => {
     try {
-      return text
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '');
-    } catch (error) {
-      console.error('Error generating slug:', error);
+      return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+    } catch {
       return '';
     }
   };
@@ -145,8 +133,7 @@ function EditorProductForm({ initialProduct }) {
         keywords: keywordsSEO,
       });
 
-      const newSlug = generateSlug(title);
-      setSlug(newSlug);
+      setSlug(generateSlug(title));
       setIsSlugTouched(false);
     } catch (error) {
       console.error('Error generating SEO:', error);
@@ -171,31 +158,25 @@ function EditorProductForm({ initialProduct }) {
   const margin = price && costPerItem ? ((profit / Number(price)) * 100).toFixed(2) : 0;
 
   const handleSave = async () => {
-    // Clear previous errors
     setErrors({});
-    
-    // Basic client-side validation
+
     if (!title.trim()) {
       setErrors(prev => ({ ...prev, name: 'Product name is required' }));
       return;
     }
-    
     if (!category.trim()) {
       setErrors(prev => ({ ...prev, category: 'Category is required' }));
       return;
     }
-    
     if (!price || Number(price) <= 0) {
       setErrors(prev => ({ ...prev, price: 'Valid price is required' }));
       return;
     }
-    
     if (isSlugDuplicate) {
       setErrors(prev => ({ ...prev, slug: 'Slug must be unique' }));
       return;
     }
 
-    // Construct product data
     const productData = {
       name: title,
       slug,
@@ -208,8 +189,8 @@ function EditorProductForm({ initialProduct }) {
       category,
       brand,
       features: features.split('\n').filter(Boolean),
-      sizes: sizes.split(',').map((s) => s.trim()).filter(Boolean),
-      tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+      sizes: sizes.split(',').map(s => s.trim()).filter(Boolean),
+      tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       gallery: mediaUrls,
       youtubeLink,
       aiGeneratedSummary: aiSummary,
@@ -225,13 +206,11 @@ function EditorProductForm({ initialProduct }) {
       isFeatured,
     };
 
-    // Validate with Zod schema
     const validation = productSchema.safeParse(productData);
     if (!validation.success) {
       const formErrors = {};
       validation.error.errors.forEach(err => {
-        const fieldName = err.path[0];
-        formErrors[fieldName] = err.message;
+        formErrors[err.path[0]] = err.message;
       });
       setErrors(formErrors);
       alert('Please fix validation errors before saving.');
@@ -240,7 +219,8 @@ function EditorProductForm({ initialProduct }) {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/products/upload', {
+      // ✅ Updated to new API endpoint
+      const res = await fetch('/api/products/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productData),
@@ -253,10 +233,6 @@ function EditorProductForm({ initialProduct }) {
 
       const result = await res.json();
       alert('✅ Product added successfully!');
-      
-      // Reset form or redirect as needed
-      // You might want to add a callback prop to handle post-save actions
-      
     } catch (err) {
       console.error('Error adding product:', err);
       alert(`❌ Error adding product: ${err.message}`);
@@ -294,11 +270,11 @@ function EditorProductForm({ initialProduct }) {
 
       <ProductDescriptionEditor description={description} setDescription={setDescription} />
 
-      <ProductMediaUploader 
-        media={media} 
-        setMedia={setMedia} 
-        gallery={initialProduct?.gallery || []} 
-        setMediaUrls={setMediaUrls} 
+      <ProductMediaUploader
+        mediaFiles={mediaFiles}
+        setMediaFiles={setMediaFiles}
+        mediaUrls={mediaUrls}
+        setMediaUrls={setMediaUrls}
       />
 
       <ProductColorsEditor colors={colors} setColors={setColors} />
@@ -344,21 +320,13 @@ function EditorProductForm({ initialProduct }) {
       />
       {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
 
-      {/* Stock Management */}
       <div className="mb-4 flex items-center gap-2">
-        <input 
-          type="checkbox" 
-          checked={stock} 
-          onChange={(e) => setStock(e.target.checked)} 
-          id="stock" 
-        />
+        <input type="checkbox" checked={stock} onChange={(e) => setStock(e.target.checked)} id="stock" />
         <label htmlFor="stock">In Stock</label>
       </div>
 
       <div className="mb-4">
-        <label htmlFor="inStockCount" className="block text-sm font-medium mb-1">
-          Stock Count
-        </label>
+        <label htmlFor="inStockCount" className="block text-sm font-medium mb-1">Stock Count</label>
         <input
           type="number"
           id="inStockCount"
@@ -367,13 +335,10 @@ function EditorProductForm({ initialProduct }) {
           className="w-full border rounded p-2"
           min={0}
         />
-        {errors.inStockCount && <p className="text-red-500 text-sm mt-1">{errors.inStockCount}</p>}
       </div>
 
       <div className="mb-4">
-        <label htmlFor="shippingFee" className="block text-sm font-medium mb-1">
-          Shipping Fee ($)
-        </label>
+        <label htmlFor="shippingFee" className="block text-sm font-medium mb-1">Shipping Fee ($)</label>
         <input
           type="number"
           id="shippingFee"
@@ -383,13 +348,10 @@ function EditorProductForm({ initialProduct }) {
           min={0}
           step={0.01}
         />
-        {errors.shippingFee && <p className="text-red-500 text-sm mt-1">{errors.shippingFee}</p>}
       </div>
 
       <div className="mb-4">
-        <label htmlFor="deliveryDate" className="block text-sm font-medium mb-1">
-          Delivery Date
-        </label>
+        <label htmlFor="deliveryDate" className="block text-sm font-medium mb-1">Delivery Date</label>
         <input
           type="date"
           id="deliveryDate"
@@ -400,9 +362,7 @@ function EditorProductForm({ initialProduct }) {
       </div>
 
       <div className="mb-4">
-        <label htmlFor="soldBy" className="block text-sm font-medium mb-1">
-          Sold By
-        </label>
+        <label htmlFor="soldBy" className="block text-sm font-medium mb-1">Sold By</label>
         <input
           type="text"
           id="soldBy"
@@ -413,32 +373,17 @@ function EditorProductForm({ initialProduct }) {
       </div>
 
       <div className="mb-4 flex items-center gap-2">
-        <input 
-          type="checkbox" 
-          checked={giftOption} 
-          onChange={(e) => setGiftOption(e.target.checked)} 
-          id="giftOption" 
-        />
+        <input type="checkbox" checked={giftOption} onChange={(e) => setGiftOption(e.target.checked)} id="giftOption" />
         <label htmlFor="giftOption">Gift Option</label>
       </div>
 
       <div className="mb-4 flex items-center gap-2">
-        <input 
-          type="checkbox" 
-          checked={isNew} 
-          onChange={(e) => setIsNew(e.target.checked)} 
-          id="isNew" 
-        />
+        <input type="checkbox" checked={isNew} onChange={(e) => setIsNew(e.target.checked)} id="isNew" />
         <label htmlFor="isNew">New Product</label>
       </div>
 
       <div className="mb-4 flex items-center gap-2">
-        <input 
-          type="checkbox" 
-          checked={isFeatured} 
-          onChange={(e) => setIsFeatured(e.target.checked)} 
-          id="isFeatured" 
-        />
+        <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} id="isFeatured" />
         <label htmlFor="isFeatured">Featured Product</label>
       </div>
 
@@ -460,13 +405,11 @@ function EditorProductForm({ initialProduct }) {
       {slugLoading && <p className="text-blue-500 text-sm mt-1">Checking slug availability...</p>}
 
       <div className="flex gap-2">
-        <button 
-          onClick={handleSave} 
+        <button
+          onClick={handleSave}
           disabled={loading || slugLoading || isSlugDuplicate}
           className={`mt-2 px-4 py-2 text-white rounded transition-colors ${
-            loading || slugLoading || isSlugDuplicate
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-green-600 hover:bg-green-700'
+            loading || slugLoading || isSlugDuplicate ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
           }`}
         >
           {loading ? 'Adding Product...' : 'Add Product'}

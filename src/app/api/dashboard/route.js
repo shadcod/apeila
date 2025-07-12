@@ -1,29 +1,54 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const filePath = path.join(process.cwd(), 'public', 'data', 'dashboard.json');
+import { db } from '@/lib/firebase';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
-    return new Response(JSON.stringify(data), { status: 200 });
+    const querySnapshot = await getDocs(collection(db, 'dashboard'));
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return Response.json(
+      successResponse(data, 'Dashboard data retrieved successfully'),
+      { status: 200 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to read dashboard' }), { status: 500 });
+    console.error('Error fetching dashboard data:', error);
+    return Response.json(
+      errorResponse('Failed to read dashboard'),
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req) {
   try {
     const newItem = await req.json();
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
 
-    data.push(newItem);
+    // Basic validation
+    if (!newItem.title) {
+      return Response.json(
+        errorResponse('Dashboard item title is required'),
+        { status: 400 }
+      );
+    }
 
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    const docRef = await addDoc(collection(db, 'dashboard'), {
+      ...newItem,
+      createdAt: serverTimestamp(),
+    });
+
+    return Response.json(
+      successResponse({ id: docRef.id }, 'Dashboard item created successfully'),
+      { status: 201 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to save dashboard item' }), { status: 500 });
+    console.error('Error saving dashboard item:', error);
+    return Response.json(
+      errorResponse('Failed to save dashboard item'),
+      { status: 500 }
+    );
   }
 }

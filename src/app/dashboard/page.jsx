@@ -10,7 +10,7 @@ const DashboardPage = () => {
   const fetchData = async () => {
     await handleAsync(
       async () => {
-        const res = await fetch('/data/dashboard.json');
+        const res = await fetch('/api/dashboard');
         
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);

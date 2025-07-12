@@ -1,6 +1,6 @@
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ApiResponse, createErrorResponse } from '@/lib/apiResponse';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function OPTIONS() {
   return new Response(null, {
@@ -17,13 +17,12 @@ export async function POST(request) {
   try {
     const newProduct = await request.json();
 
-    // Validation
+    // Basic validation
     if (!newProduct.name || !newProduct.slug) {
-      return ApiResponse.validationError(
-        ['Name and slug are required'],
-        'Product validation failed',
-        400
-      ).toResponse();
+      return Response.json(
+        errorResponse('Name and slug are required for product creation'),
+        { status: 400 }
+      );
     }
 
     const {
@@ -83,27 +82,15 @@ export async function POST(request) {
 
     const docRef = await addDoc(collection(db, 'products'), productWithMeta);
 
-    return new Response(
-      JSON.stringify({ message: 'Product created successfully!', id: docRef.id }),
-      {
-        status: 201,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
+    return Response.json(
+      successResponse({ id: docRef.id }, 'Product created successfully!'),
+      { status: 201 }
     );
   } catch (error) {
     console.error('Error creating product:', error);
-    return new Response(
-      JSON.stringify({ message: 'Server error while creating product' }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
+    return Response.json(
+      errorResponse('Server error while creating product'),
+      { status: 500 }
     );
   }
 }

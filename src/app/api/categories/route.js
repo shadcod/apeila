@@ -1,58 +1,65 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { ApiResponse, createErrorResponse } from '@/lib/apiResponse';
-
-const filePath = path.join(process.cwd(), 'public', 'data', 'categories.json');
+import { db } from '@/lib/firebase';
+import { collection, getDocs, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
-    
-    return ApiResponse.success(
-      data,
-      'Categories retrieved successfully'
-    ).toResponse();
+    const querySnapshot = await getDocs(collection(db, 'categories'));
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return Response.json(
+      successResponse(data, 'Categories retrieved successfully')
+    );
   } catch (error) {
-    return createErrorResponse(error, 'Failed to retrieve categories');
+    console.error('Error fetching categories:', error);
+    return Response.json(
+      errorResponse('Failed to retrieve categories'),
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req) {
   try {
     const newItem = await req.json();
-    
+
     // Validation
     if (!newItem.name) {
-      return ApiResponse.validationError(
-        ['Category name is required'],
-        'Category validation failed'
-      ).toResponse();
+      return Response.json(
+        errorResponse('Category name is required'),
+        { status: 400 }
+      );
     }
-
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
 
     // Check for duplicate
-    const exists = data.some(item => item.name === newItem.name);
-    if (exists) {
-      return ApiResponse.error(
-        'Category already exists',
-        'Duplicate category name',
-        409
-      ).toResponse();
+    const q = query(collection(db, 'categories'), where('name', '==', newItem.name));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      return Response.json(
+        errorResponse('Category already exists'),
+        { status: 409 }
+      );
     }
 
-    data.push({ ...newItem, id: Date.now(), createdAt: new Date().toISOString() });
+    const docRef = await addDoc(collection(db, 'categories'), {
+      name: newItem.name,
+      description: newItem.description || '',
+      createdAt: serverTimestamp(),
+    });
 
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    
-    return ApiResponse.success(
-      newItem,
-      'Category created successfully',
-      201
-    ).toResponse();
+    return Response.json(
+      successResponse({ id: docRef.id }, 'Category created successfully'),
+      { status: 201 }
+    );
   } catch (error) {
-    return createErrorResponse(error, 'Failed to create category');
+    console.error('Error creating category:', error);
+    return Response.json(
+      errorResponse('Failed to create category'),
+      { status: 500 }
+    );
   }
 }

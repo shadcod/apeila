@@ -1,29 +1,54 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const filePath = path.join(process.cwd(), 'public', 'data', 'collections.json');
+import { db } from '@/lib/firebase';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
-    return new Response(JSON.stringify(data), { status: 200 });
+    const querySnapshot = await getDocs(collection(db, 'collections'));
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return Response.json(
+      successResponse(data, 'Collections retrieved successfully'),
+      { status: 200 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to read collections' }), { status: 500 });
+    console.error('Error fetching collections:', error);
+    return Response.json(
+      errorResponse('Failed to read collections'),
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req) {
   try {
     const newItem = await req.json();
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
 
-    data.push(newItem);
+    // Basic validation
+    if (!newItem.name) {
+      return Response.json(
+        errorResponse('Collection name is required'),
+        { status: 400 }
+      );
+    }
 
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    const docRef = await addDoc(collection(db, 'collections'), {
+      ...newItem,
+      createdAt: serverTimestamp(),
+    });
+
+    return Response.json(
+      successResponse({ id: docRef.id }, 'Collection created successfully'),
+      { status: 201 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to save collection' }), { status: 500 });
+    console.error('Error saving collection:', error);
+    return Response.json(
+      errorResponse('Failed to save collection'),
+      { status: 500 }
+    );
   }
 }

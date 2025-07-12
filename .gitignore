@@ -52,3 +52,7 @@ coverage/
 .firebase/
 firebase.json
 .firebaserc
+
+# 📦 .historys/
+.history/
+

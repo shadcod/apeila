@@ -8,7 +8,7 @@ export default function PurchaseOrdersPage() {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await fetch('/data/purchase-orders.json');
+      const res = await fetch('/api/purchase-orders');
       const data = await res.json();
       setOrders(data);
     };

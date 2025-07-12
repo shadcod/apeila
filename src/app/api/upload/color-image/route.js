@@ -1,26 +1,42 @@
-import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs/promises';
 
 export async function POST(req) {
-  const formData = await req.formData();
-  const file = formData.get('file');
-  const productSlug = formData.get('productSlug') || 'default';
+  try {
+    const formData = await req.formData();
+    const file = formData.get('file');
+    const slug = formData.get('slug'); // تأكد أن الـ slug يرسل مع الفورم
 
-  if (!file) return new Response(JSON.stringify({ error: 'No file uploaded' }), { status: 400 });
+    if (!file) {
+      return new Response(JSON.stringify({ message: 'No file uploaded' }), { status: 400 });
+    }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+    if (!slug) {
+      return new Response(JSON.stringify({ message: 'Product slug is required' }), { status: 400 });
+    }
 
-  const folderPath = path.join(process.cwd(), 'public', 'uploads', 'products', productSlug, 'color_images');
-  await mkdir(folderPath, { recursive: true });
+    // تحقق نوع الملف وحجمه حسب الحاجة هنا
 
-  const fileName = `${uuidv4()}_${file.name.replace(/\s+/g, '_')}`;
-  const filePath = path.join(folderPath, fileName);
+    const fileName = `${Date.now()}-${file.name}`;
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products', slug, 'product_images');
 
-  await writeFile(filePath, buffer);
+    // أنشئ المجلدات تلقائياً لو مش موجودة
+    try {
+      await fs.access(uploadDir);
+    } catch {
+      await fs.mkdir(uploadDir, { recursive: true });
+    }
 
-  const fileUrl = `/uploads/products/${productSlug}/color_images/${fileName}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const filePath = path.join(uploadDir, fileName);
+    await fs.writeFile(filePath, buffer);
 
-  return new Response(JSON.stringify({ url: fileUrl }), { status: 200 });
+    // المسار اللي يرجع للعميل ليستخدمه في الواجهة
+    const url = `/uploads/products/${slug}/product_images/${fileName}`;
+
+    return new Response(JSON.stringify({ message: 'Uploaded successfully!', url }), { status: 200 });
+  } catch (error) {
+    console.error('Error uploading media:', error);
+    return new Response(JSON.stringify({ message: 'Server error while uploading media' }), { status: 500 });
+  }
 }
-

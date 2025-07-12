@@ -1,29 +1,54 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const filePath = path.join(process.cwd(), 'public', 'data', 'gift-cards.json');
+import { db } from '@/lib/firebase';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
-    return new Response(JSON.stringify(data), { status: 200 });
+    const querySnapshot = await getDocs(collection(db, 'giftCards'));
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return Response.json(
+      successResponse(data, 'Gift cards retrieved successfully'),
+      { status: 200 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to read gift cards' }), { status: 500 });
+    console.error('Error fetching gift cards:', error);
+    return Response.json(
+      errorResponse('Failed to read gift cards'),
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req) {
   try {
     const newItem = await req.json();
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
 
-    data.push(newItem);
+    // Basic validation
+    if (!newItem.code || !newItem.amount) {
+      return Response.json(
+        errorResponse('Gift card code and amount are required'),
+        { status: 400 }
+      );
+    }
 
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    const docRef = await addDoc(collection(db, 'giftCards'), {
+      ...newItem,
+      createdAt: serverTimestamp(),
+    });
+
+    return Response.json(
+      successResponse({ id: docRef.id }, 'Gift card created successfully'),
+      { status: 201 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to save gift card' }), { status: 500 });
+    console.error('Error saving gift card:', error);
+    return Response.json(
+      errorResponse('Failed to save gift card'),
+      { status: 500 }
+    );
   }
 }

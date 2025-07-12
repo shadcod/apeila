@@ -6,7 +6,7 @@ import { Upload, Trash2, Star, Edit2 } from 'lucide-react';
 import { ReactSortable } from 'react-sortablejs';
 import toast from 'react-hot-toast';
 
-export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
+export default function ProductMediaUploader({ slug, gallery = [], setGallery }) {
   const [previewItems, setPreviewItems] = useState([]);
   const [mainImageIdx, setMainImageIdx] = useState(0);
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -29,8 +29,8 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
   }, []);
 
   useEffect(() => {
-    if (mediaUrls.length > 0) {
-      const items = mediaUrls.map((url) => ({
+    if (gallery.length > 0) {
+      const items = gallery.map((url) => ({
         id: uuidv4(),
         type: url.endsWith('.mp4') ? 'video' : 'image',
         url,
@@ -39,7 +39,7 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
       setPreviewItems(items);
       setMainImageIdx(0);
     }
-  }, [mediaUrls]);
+  }, [gallery]);
 
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
@@ -50,21 +50,24 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
     for (const file of files) {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('slug', slug);
 
       try {
-        const res = await fetch('/api/upload/media', {
+        const res = await fetch(`/api/upload/products/${slug}/media`, {
           method: 'POST',
           body: formData,
         });
 
         const data = await res.json();
-        if (data.url) {
+        if (data.success && data.url) {
           uploadedUrls.push({
             id: uuidv4(),
             type: file.type.startsWith('video') ? 'video' : 'image',
             url: data.url,
             file: null,
           });
+        } else {
+          throw new Error(data.message || 'Upload failed');
         }
       } catch (err) {
         console.error('Upload error:', err);
@@ -74,7 +77,7 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
 
     const updated = [...previewItems, ...uploadedUrls];
     setPreviewItems(updated);
-    setMediaUrls(updated.map((item) => item.url));
+    setGallery(updated.map((item) => item.url));
     if (mainImageIdx === null && updated.length > 0) setMainImageIdx(0);
   };
 
@@ -82,7 +85,7 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
     const updated = [...previewItems];
     updated.splice(index, 1);
     setPreviewItems(updated);
-    setMediaUrls(updated.map((item) => item.url));
+    setGallery(updated.map((item) => item.url));
     if (mainImageIdx === index) setMainImageIdx(null);
     else if (mainImageIdx > index) setMainImageIdx(mainImageIdx - 1);
   };
@@ -90,15 +93,10 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
   const handleAddUrl = () => {
     if (!newUrl) return;
     const type = newUrl.endsWith('.mp4') ? 'video' : 'image';
-    const newItem = {
-      id: uuidv4(),
-      type,
-      url: newUrl,
-      file: null,
-    };
+    const newItem = { id: uuidv4(), type, url: newUrl, file: null };
     const updated = [...previewItems, newItem];
     setPreviewItems(updated);
-    setMediaUrls(updated.map((item) => item.url));
+    setGallery(updated.map((item) => item.url));
     if (mainImageIdx === null && updated.length > 0) setMainImageIdx(0);
     setNewUrl('');
     setShowUrlInput(false);
@@ -110,7 +108,7 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
     updatedItems[editingImageIdx].url = dataUrl;
     updatedItems[editingImageIdx].file = null;
     setPreviewItems(updatedItems);
-    setMediaUrls(updatedItems.map((item) => item.url));
+    setGallery(updatedItems.map((item) => item.url));
     setEditorOpen(false);
     toast.success('Image updated successfully');
   };
@@ -149,8 +147,7 @@ export default function ProductMediaUploader({ mediaUrls = [], setMediaUrls }) {
   const getValidUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('http') || url.startsWith('https')) return url;
-    if (url.startsWith('/img') || url.startsWith('img')) return `/${url.replace(/^\/?/, '')}`;
-    return `/uploads/${url}`;
+    return `/uploads/products/${slug}/product_images/${url}`;
   };
 
   return (

@@ -7,7 +7,7 @@ export default function CollectionsPage() {
 
   useEffect(() => {
     const fetchCollections = async () => {
-      const res = await fetch('/data/collections.json');
+      const res = await fetch('/api/collections');
       const data = await res.json();
       setCollections(data);
     };

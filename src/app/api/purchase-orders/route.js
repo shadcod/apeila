@@ -1,29 +1,54 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const filePath = path.join(process.cwd(), 'public', 'data', 'purchase-orders.json');
+import { db } from '@/lib/firebase';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
-    return new Response(JSON.stringify(data), { status: 200 });
+    const querySnapshot = await getDocs(collection(db, 'purchaseOrders'));
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return Response.json(
+      successResponse(data, 'Purchase orders retrieved successfully'),
+      { status: 200 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to read purchase orders' }), { status: 500 });
+    console.error('Error fetching purchase orders:', error);
+    return Response.json(
+      errorResponse('Failed to read purchase orders'),
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req) {
   try {
     const newItem = await req.json();
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
 
-    data.push(newItem);
+    // Basic validation
+    if (!newItem.supplier || !newItem.items || !Array.isArray(newItem.items)) {
+      return Response.json(
+        errorResponse('Supplier and items (array) are required'),
+        { status: 400 }
+      );
+    }
 
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    const docRef = await addDoc(collection(db, 'purchaseOrders'), {
+      ...newItem,
+      createdAt: serverTimestamp(),
+    });
+
+    return Response.json(
+      successResponse({ id: docRef.id }, 'Purchase order created successfully'),
+      { status: 201 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to save purchase order' }), { status: 500 });
+    console.error('Error saving purchase order:', error);
+    return Response.json(
+      errorResponse('Failed to save purchase order'),
+      { status: 500 }
+    );
   }
 }
