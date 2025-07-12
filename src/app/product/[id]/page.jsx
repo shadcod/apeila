@@ -52,10 +52,10 @@ export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState(null);
   const [hoverColor, setHoverColor] = useState(null);
 
-  // بحث وتحميل المنتج عند تغير الـ id أو products
+  // ✅ أهم تعديل هنا
   useEffect(() => {
     if (products.length > 0) {
-      const current = products.find((p) => p.id === parseInt(id, 10));
+      const current = products.find((p) => p.id === id); // حذف parseInt ✅
       if (current) {
         setProduct(current);
         setSelectedColor(current.colors?.[0] || null);
@@ -67,12 +67,9 @@ export default function ProductPage() {
     }
   }, [id, products]);
 
-  // تحديث selectedIndex بناء على اللون المختار أو hover (تأخير لتجنب التغيير السريع)
   useEffect(() => {
     if (!product) return;
-
     const galleryImages = product.gallery?.length > 0 ? product.gallery : [product.img];
-    // اللون الذي نستخدمه: hoverColor له أولوية على selectedColor
     const activeColor = hoverColor || selectedColor;
 
     if (activeColor?.image) {
@@ -83,7 +80,6 @@ export default function ProductPage() {
     }
   }, [selectedColor, hoverColor, product]);
 
-  // حساب خصم السعر بذاكرة ميمو لتحسين الأداء
   const discount = useMemo(() => {
     if (product?.oldPrice && product?.price) {
       return Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
@@ -91,14 +87,13 @@ export default function ProductPage() {
     return 0;
   }, [product]);
 
-  // دالة لإنشاء تقييم النجوم بدقة مع دعم النجوم النصفية
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       if (rating >= i) {
         stars.push(<span key={i} className="text-yellow-500">★</span>);
       } else if (rating >= i - 0.5) {
-        stars.push(<span key={i} className="text-yellow-500">⯨</span>); // نجمة نصفية (يمكن تعديلها بأيقونة أفضل)
+        stars.push(<span key={i} className="text-yellow-500">⯨</span>);
       } else {
         stars.push(<span key={i} className="text-gray-300">☆</span>);
       }
@@ -112,10 +107,7 @@ export default function ProductPage() {
 
   return (
     <div className="w-full px-5 py-6 bg-white overflow-x-hidden max-w-[1300px] mx-auto">
-      <div
-        className="grid grid-cols-[80px_1px_minmax(300px,1fr)_10px_minmax(320px,1fr)_10px_minmax(280px,1fr)] gap-0 items-start"
-      >
-        {/* الصور المصغرة */}
+      <div className="grid grid-cols-[80px_1px_minmax(300px,1fr)_10px_minmax(320px,1fr)_10px_minmax(280px,1fr)] gap-0 items-start">
         <aside className="pt-6 sticky top-24 h-[600px] overflow-y-auto">
           <ProductGallery
             product={product}
@@ -124,11 +116,7 @@ export default function ProductPage() {
             mode="thumbnails"
           />
         </aside>
-
-        {/* فاصل 1px */}
         <div className="bg-gray-300 w-px" />
-
-        {/* الصورة الرئيسية */}
         <section className="relative product-main-image w-full h-[600px] flex justify-center items-center">
           <ProductGallery
             product={product}
@@ -138,23 +126,14 @@ export default function ProductPage() {
             mode="main"
           />
         </section>
-
-        {/* فاصل 10px */}
         <div style={{ width: "10px" }} />
-
-        {/* تفاصيل المنتج */}
         <article className="product-details space-y-4 pl-4 pr-2">
           <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
-
-          {/* التقييم */}
           <div className="product-rating flex items-center gap-2">
             <div className="flex">{renderStars(product.rating)}</div>
             <span className="text-sm text-gray-600">({product.reviewsCount} reviews)</span>
           </div>
-
           <hr className="my-2 border-gray-300" />
-
-          {/* السعر والخصم */}
           <div className="product-price flex items-center gap-2 text-xl font-semibold text-green-700">
             <span>${product.price.toFixed(2)}</span>
             {product.oldPrice && (
@@ -164,20 +143,15 @@ export default function ProductPage() {
               </>
             )}
           </div>
-
-          {/* اختيار اللون */}
           <ColorSelector
             colors={product.colors}
             selectedColor={selectedColor}
             onSelect={setSelectedColor}
             onHover={(color) => {
-              // تأخير بسيط لتجنب تغيير سريع عند المرور السريع
               if (color) setHoverColor(color);
               else setHoverColor(null);
             }}
           />
-
-          {/* اختيار الحجم */}
           {product.sizes?.length > 0 && (
             <SizeSelector
               sizes={product.sizes}
@@ -185,8 +159,6 @@ export default function ProductPage() {
               onSelect={setSelectedSize}
             />
           )}
-
-          {/* AI Summary */}
           {product.aiGeneratedSummary && (
             <details className="product-ai-summary bg-yellow-50 p-3 rounded mt-4 text-sm text-yellow-900 border border-yellow-300">
               <summary className="cursor-pointer flex items-center gap-2 font-semibold">
@@ -210,8 +182,6 @@ export default function ProductPage() {
               <p className="mt-2">{product.aiGeneratedSummary}</p>
             </details>
           )}
-
-          {/* تفاصيل أخرى */}
           <ProductDetails
             product={{
               ...product,
@@ -221,11 +191,7 @@ export default function ProductPage() {
             setSelectedIndex={setSelectedIndex}
           />
         </article>
-
-        {/* فاصل 10px */}
         <div style={{ width: "10px" }} />
-
-        {/* صندوق الشراء */}
         <aside className="product-purchase-box sticky top-24">
           <ProductSidebar
             product={product}
@@ -235,18 +201,12 @@ export default function ProductPage() {
           />
         </aside>
       </div>
-
-      {/* المنتجات المشابهة */}
       <section className="product-similar-products mt-10">
         <SimilarProducts currentProduct={product} allProducts={products} />
       </section>
-
-      {/* المنتجات ذات الصلة */}
       <section className="product-related-products mt-6">
         <RelatedProducts currentProduct={product} allProducts={products} />
       </section>
-
-      {/* Zoom Modal */}
       {isZoomOpen && (
         <ZoomModal onClose={() => setIsZoomOpen(false)}>
           {galleryImages[selectedIndex]?.endsWith(".mp4") ? (

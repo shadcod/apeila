@@ -6,17 +6,17 @@ export default function SizeSelector({ sizes = [], selectedSize, onSelect }) {
 
   return (
     <div className="mt-6">
-      {/* العنوان */}
+      {/* Title */}
       <div className="text-base font-semibold mb-1 text-gray-700 pl-[10px]">Size:</div>
 
-      {/* الحجم المختار */}
+      {/* Selected size */}
       {selectedSize && (
         <div className="text-sm text-gray-600 font-medium mb-3 pl-[10px]">
           Selected size: <strong>{selectedSize}</strong>
         </div>
       )}
 
-      {/* أزرار الأحجام */}
+      {/* Size buttons */}
       <div className="flex flex-wrap gap-2 pl-[10px] overflow-x-auto whitespace-nowrap">
         {sizes.map((size, index) => (
           <button

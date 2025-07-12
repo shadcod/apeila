@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export default function ZoomModal({ onClose, children }) {
@@ -8,7 +8,7 @@ export default function ZoomModal({ onClose, children }) {
   const closeButtonRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // منع السكرول
+  // منع تمرير الصفحة عند فتح المودال
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -16,12 +16,11 @@ export default function ZoomModal({ onClose, children }) {
     };
   }, []);
 
-  // إغلاق بالمفتاح Esc
+  // إغلاق المودال بالمفتاح ESC وحصر التركيز داخل المودال
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
 
-      // Trap focus داخل المودال
       if (e.key === "Tab") {
         const focusableElements = modalRef.current.querySelectorAll(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -43,10 +42,17 @@ export default function ZoomModal({ onClose, children }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  // التركيز التلقائي على زر الإغلاق
+  // التركيز على زر الإغلاق عند تحميل المودال
   useEffect(() => {
     closeButtonRef.current?.focus();
   }, []);
+
+  // إعادة تعيين حالة التحميل عند تغيير المحتوى
+  useEffect(() => {
+    setIsLoaded(false);
+  }, [children]);
+
+  if (typeof document === "undefined") return null; // تأمين SSR
 
   return createPortal(
     <div
@@ -71,19 +77,19 @@ export default function ZoomModal({ onClose, children }) {
           ✕
         </button>
 
-        {/* Spinner أثناء التحميل */}
+        {/* سبينر تحميل */}
         {!isLoaded && (
           <div className="absolute inset-0 flex items-center justify-center z-0">
             <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
-        {/* المحتوى الديناميكي */}
+        {/* محتوى المودال */}
         <div className="media-container rounded overflow-hidden max-w-full max-h-full">
-          {typeof children === "object" && "type" in children
+          {React.isValidElement(children)
             ? React.cloneElement(children, {
                 onLoad: () => setIsLoaded(true),
-                onLoadedData: () => setIsLoaded(true), // للفيديوهات
+                onLoadedData: () => setIsLoaded(true),
               })
             : children}
         </div>
