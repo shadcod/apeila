@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react';
 import Loading from '@/app/(main)/loading';
 import ProductTitleInput from '@/components/dashboard/product-editor/ProductTitleInput';

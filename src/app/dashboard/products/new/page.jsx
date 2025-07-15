@@ -1,5 +1,7 @@
 import EditorProductForm from '@/components/dashboard/product-table/EditorProductForm';
 
+export const dynamic = 'force-dynamic';
+
 export default function Page() {
   const emptyProduct = {
     name: '',
