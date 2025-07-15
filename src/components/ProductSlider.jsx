@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAppContext } from "@context/AppContext";
@@ -10,8 +11,7 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/autoplay'
 
-import { db } from '@/lib/firebase'
-import { collection, getDocs } from 'firebase/firestore'
+import { supabase } from '@/lib/supabase'
 
 export default function ProductSlider({ title, category }) {
   const [products, setProducts] = useState([])
@@ -21,17 +21,25 @@ export default function ProductSlider({ title, category }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'products'))
-        let data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+
+        if (error) {
+          console.error('Error loading products from Supabase:', error)
+          throw error
+        }
+
+        let filteredData = data
 
         if (category === 'sale') {
-          data = data.filter(item => item.oldPrice)
+          filteredData = data.filter(item => item.oldPrice)
         } else {
-          data = data.filter(item => item.category === category)
+          filteredData = data.filter(item => item.category === category)
         }
-        setProducts(data)
+        setProducts(filteredData)
       } catch (error) {
-        console.error('Error loading products from Firebase:', error)
+        console.error('Error loading products:', error)
       }
     }
     fetchProducts()
@@ -132,3 +140,5 @@ export default function ProductSlider({ title, category }) {
     </section>
   )
 }
+
+

@@ -1,9 +1,9 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import ProductEditorForm from '@/components/dashboard/product-editor/ProductEditorForm';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
 import { useRouter, useParams } from 'next/navigation';
 
 export default function Page() {
@@ -26,24 +26,21 @@ export default function Page() {
 
     async function fetchProduct() {
       try {
-        const docRef = doc(db, 'products', id);
-        console.log("📄 docRef path:", docRef.path);
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('id', id)
+          .single();
 
-        const docSnap = await getDoc(docRef);
-
-        if (!docSnap.exists()) {
-          console.log("⚠️ Product not found in Firebase. Redirecting...");
+        if (error || !data) {
+          console.error("⚠️ Product not found in Supabase or error fetching:", error);
           router.push('/dashboard/products');
           return;
         }
 
-        // Remove any 'id' field from data to avoid overriding the document ID
-        const data = docSnap.data();
-        delete data.id;
+        console.log("✅ Product data from Supabase:", data);
 
-        console.log("✅ Product data from Firebase:", data);
-
-        setProduct({ id: docSnap.id, ...data });
+        setProduct(data);
       } catch (error) {
         console.error("💥 Error fetching product:", error);
         router.push('/dashboard/products');
@@ -60,3 +57,5 @@ export default function Page() {
 
   return <ProductEditorForm initialProduct={product} />;
 }
+
+

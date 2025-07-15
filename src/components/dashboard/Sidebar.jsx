@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -23,8 +24,7 @@ import {
   FaEye,
 } from 'react-icons/fa';
 
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 
 const links = [
   { name: 'Home', path: '/dashboard/home', icon: FaHome, roles: ['admin', 'staff'] },
@@ -59,11 +59,17 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, userRole = 'admin
   useEffect(() => {
     async function fetchProductCount() {
       try {
-        const productsSnapshot = await getDocs(collection(db, 'products'));
-        const count = productsSnapshot.size;
-        setProductsCount(count);
+        const { data, error } = await supabase
+          .from('products')
+          .select('id');
+
+        if (error) {
+          console.error('Error fetching product count from Supabase:', error);
+          return;
+        }
+        setProductsCount(data.length);
       } catch (err) {
-        console.error('Error fetching product count from Firestore:', err);
+        console.error('Error fetching product count:', err);
       }
     }
     fetchProductCount();
@@ -216,3 +222,5 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, userRole = 'admin
     </aside>
   );
 }
+
+

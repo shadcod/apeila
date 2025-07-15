@@ -1,10 +1,10 @@
+
 'use client'
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { supabase } from '@/lib/supabase'
 
 export default function CollectionDetailsPage() {
   const { id } = useParams()
@@ -16,22 +16,28 @@ export default function CollectionDetailsPage() {
     const fetchData = async () => {
       try {
         // جلب بيانات المجموعة المحددة
-        const collectionRef = doc(db, 'collections', id)
-        const collectionSnap = await getDoc(collectionRef)
+        const { data: collectionInfo, error: collectionError } = await supabase
+          .from('collections')
+          .select('*')
+          .eq('id', id)
+          .single()
 
-        if (!collectionSnap.exists()) {
+        if (collectionError || !collectionInfo) {
+          console.error('Error fetching collection:', collectionError)
           setCollectionData(null)
           return
         }
 
-        const collectionInfo = collectionSnap.data()
-
         // جلب كل المنتجات
-        const productsSnapshot = await getDocs(collection(db, 'products'))
-        const productsList = productsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
+        const { data: productsList, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+
+        if (productsError) {
+          console.error('Error fetching products:', productsError)
+          setAllProducts([])
+          return
+        }
 
         // ربط المنتجات اللي موجودة في هذه المجموعة
         const linked = productsList.filter((p) => collectionInfo.products?.includes(p.id))
@@ -72,7 +78,7 @@ export default function CollectionDetailsPage() {
           <div className="mt-2 text-xs space-x-2">
             <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold 
               ${collectionData.status === 'Active' 
-                ? 'bg-green-100 text-green-700' 
+                ? 'bg-green-100 text-green-700'
                 : 'bg-gray-200 text-gray-600'}`}>
               {collectionData.status}
             </span>
@@ -168,3 +174,5 @@ export default function CollectionDetailsPage() {
     </div>
   )
 }
+
+

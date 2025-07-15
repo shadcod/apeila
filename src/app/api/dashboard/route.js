@@ -1,14 +1,19 @@
-import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const querySnapshot = await getDocs(collection(db, 'dashboard'));
-    const data = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const { data, error } = await supabase
+      .from('dashboard')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching dashboard data from Supabase:', error);
+      return Response.json(
+        errorResponse('Failed to retrieve dashboard data'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
       successResponse(data, 'Dashboard data retrieved successfully'),
@@ -17,7 +22,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
     return Response.json(
-      errorResponse('Failed to read dashboard'),
+      errorResponse('Failed to retrieve dashboard data'),
       { status: 500 }
     );
   }
@@ -35,20 +40,31 @@ export async function POST(req) {
       );
     }
 
-    const docRef = await addDoc(collection(db, 'dashboard'), {
-      ...newItem,
-      createdAt: serverTimestamp(),
-    });
+    const { data, error } = await supabase
+      .from('dashboard')
+      .insert({
+        ...newItem,
+        // Supabase handles createdAt automatically if default value is set in table schema
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Error creating dashboard item in Supabase:', error);
+      return Response.json(
+        errorResponse('Failed to save dashboard item'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
-      successResponse({ id: docRef.id }, 'Dashboard item created successfully'),
+      successResponse({ id: data.id }, 'Dashboard item created successfully'),
       { status: 201 }
     );
   } catch (error) {
     console.error('Error saving dashboard item:', error);
-    return Response.json(
-      errorResponse('Failed to save dashboard item'),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: 'Server error while saving dashboard item' }), { status: 500 });
   }
 }
+
+

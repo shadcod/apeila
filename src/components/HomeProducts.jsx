@@ -1,10 +1,10 @@
+
 'use client';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 
 const HomeProducts = () => {
   const [products, setProducts] = useState([]);
@@ -13,11 +13,17 @@ const HomeProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
-        const productsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setProducts(productsData);
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+
+        if (error) {
+          console.error('خطأ في جلب البيانات من Supabase:', error);
+          throw error;
+        }
+        setProducts(data);
       } catch (err) {
-        console.error('خطأ في جلب البيانات من فايرباس:', err);
+        console.error('خطأ في جلب البيانات:', err);
       }
     };
 
@@ -92,3 +98,5 @@ const HomeProducts = () => {
 };
 
 export default HomeProducts;
+
+

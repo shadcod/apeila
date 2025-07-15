@@ -1,8 +1,8 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase'; // عدل المسار حسب مشروعك
+import { supabase } from '@/lib/supabase'; // عدل المسار حسب مشروعك
 
 export default function InventoryPage() {
   const [products, setProducts] = useState([]);
@@ -10,11 +10,18 @@ export default function InventoryPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+
+        if (error) {
+          console.error('Failed to load products from Supabase:', error);
+          throw error;
+        }
+
         setProducts(data);
       } catch (error) {
-        console.error('Failed to load products from Firestore:', error);
+        console.error('Failed to load products:', error);
       }
     };
     fetchProducts();
@@ -56,7 +63,6 @@ export default function InventoryPage() {
                     {p.stock ? 'Active' : 'Archived'}
                   </span>
                 </td>
-                <td className="p-3">{p.inStockCount > 0 ? 'Yes' : 'No'}</td>
                 <td className="p-3">{p.inStockCount}</td>
                 <td className="p-3">
                   <input
@@ -73,3 +79,5 @@ export default function InventoryPage() {
     </div>
   );
 }
+
+

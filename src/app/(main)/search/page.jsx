@@ -1,10 +1,10 @@
+
 'use client';
 
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@components/ProductCard';
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase'; // تأكد من مسار استدعاء db الصحيح
+import { supabase } from '@/lib/supabase'; // تأكد من مسار استدعاء supabase الصحيح
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -17,8 +17,15 @@ export default function SearchPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+
+        if (error) {
+          console.error('Error fetching products from Supabase:', error);
+          throw error;
+        }
+
         setProducts(data);
         setLoading(false);
       } catch (err) {
@@ -74,3 +81,5 @@ export default function SearchPage() {
     </div>
   );
 }
+
+

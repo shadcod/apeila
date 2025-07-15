@@ -1,30 +1,37 @@
 import { NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 
-export function middleware(request) {
-  // قائمة الصفحات المحمية (حالياً غير مفعلة)
-  // const authPages = ['/checkout', '/orders', '/account'];
-  // const isAuthPage = authPages.some(page => request.nextUrl.pathname.startsWith(page));
+export async function middleware(req) {
+  const res = NextResponse.next();
 
-  // حاليا تم تعطيل الحماية مؤقتًا أثناء التطوير
-  /*
-  if (isAuthPage) {
-    const token = request.cookies.get('auth_token');
-    if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url));
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get: (key) => req.cookies.get(key)?.value,
+        set: (key, value, options) => res.cookies.set(key, value, options),
+        remove: (key, options) => res.cookies.delete(key, options),
+      },
     }
-  }
-  */
+  );
 
-  // السماح لكل الطلبات بالمرور بدون إعادة توجيه
-  return NextResponse.next();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const protectedPaths = ['/dashboard', '/account', '/checkout', '/orders'];
+  const isProtected = protectedPaths.some(path => req.nextUrl.pathname.startsWith(path));
+
+  if (isProtected && !session) {
+    const redirectUrl = new URL('/login', req.url);
+    redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  return res;
 }
 
 export const config = {
-  matcher: ['/checkout/:path*', '/orders/:path*', '/account/:path*'],
+  matcher: ['/dashboard/:path*', '/account/:path*', '/checkout/:path*', '/orders/:path*'],
 };
-
-/*
-  ملاحظة هامة:
-  تم تعطيل الحماية مؤقتاً للسماح بالوصول إلى صفحات الدفع، الطلبات، والحساب أثناء التطوير.
-  لا تنسى إعادة تفعيلها قبل الانتقال لمرحلة الاختبار أو الإطلاق.
-*/

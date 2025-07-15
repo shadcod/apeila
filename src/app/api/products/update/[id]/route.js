@@ -1,5 +1,4 @@
-import { db } from '@/lib/firebase';
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(req, { params }) {
   const productId = params.id;
@@ -13,12 +12,18 @@ export async function POST(req, { params }) {
   try {
     const data = await req.json();
 
-    const productRef = doc(db, 'products', productId);
+    const { error } = await supabase
+      .from('products')
+      .update(data)
+      .eq('id', productId);
 
-    await updateDoc(productRef, {
-      ...data,
-      updatedAt: serverTimestamp(),
-    });
+    if (error) {
+      console.error('Error updating product in Supabase:', error);
+      return new Response(JSON.stringify({ message: 'Failed to update product.' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     return new Response(JSON.stringify({ message: 'Product updated successfully.' }), {
       status: 200,
@@ -32,3 +37,5 @@ export async function POST(req, { params }) {
     });
   }
 }
+
+

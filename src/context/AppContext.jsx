@@ -1,8 +1,8 @@
+
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { db } from '@/lib/firebase'; // تأكد أن المسار صحيح
-import { collection, getDocs } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase'; // تأكد أن المسار صحيح
 
 const AppContext = createContext();
 
@@ -31,15 +31,21 @@ export function AppProvider({ children }) {
     return null;
   };
 
-  // 🔥 تحميل المنتجات من Firestore
+  // 🔥 تحميل المنتجات من Supabase
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+
+        if (error) {
+          console.error('Failed to load products from Supabase:', error);
+          throw error;
+        }
         setProducts(data);
       } catch (error) {
-        console.error('Failed to load products from Firestore:', error);
+        console.error('Failed to load products:', error);
       }
     };
     fetchProducts();
@@ -178,3 +184,5 @@ export function useAppContext() {
   }
   return context;
 }
+
+

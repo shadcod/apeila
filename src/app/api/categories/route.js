@@ -1,14 +1,19 @@
-import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const querySnapshot = await getDocs(collection(db, 'categories'));
-    const data = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching categories from Supabase:', error);
+      return Response.json(
+        errorResponse('Failed to retrieve categories'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
       successResponse(data, 'Categories retrieved successfully')
@@ -35,31 +40,53 @@ export async function POST(req) {
     }
 
     // Check for duplicate
-    const q = query(collection(db, 'categories'), where('name', '==', newItem.name));
-    const snapshot = await getDocs(q);
+    const { data: existingCategory, error: checkError } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('name', newItem.name)
+      .single();
 
-    if (!snapshot.empty) {
+    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 means no rows found
+      console.error('Error checking for duplicate category:', checkError);
+      return Response.json(
+        errorResponse('Failed to check for duplicate category'),
+        { status: 500 }
+      );
+    }
+
+    if (existingCategory) {
       return Response.json(
         errorResponse('Category already exists'),
         { status: 409 }
       );
     }
 
-    const docRef = await addDoc(collection(db, 'categories'), {
-      name: newItem.name,
-      description: newItem.description || '',
-      createdAt: serverTimestamp(),
-    });
+    const { data, error } = await supabase
+      .from('categories')
+      .insert({
+        name: newItem.name,
+        description: newItem.description || '',
+        // Supabase handles createdAt automatically if default value is set in table schema
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Error creating category in Supabase:', error);
+      return Response.json(
+        errorResponse('Failed to create category'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
-      successResponse({ id: docRef.id }, 'Category created successfully'),
+      successResponse({ id: data.id }, 'Category created successfully'),
       { status: 201 }
     );
   } catch (error) {
     console.error('Error creating category:', error);
-    return Response.json(
-      errorResponse('Failed to create category'),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: 'Server error while creating category' }), { status: 500 });
   }
 }
+
+

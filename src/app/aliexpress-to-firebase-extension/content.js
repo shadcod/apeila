@@ -240,7 +240,7 @@ addButton.onclick = async () => {
       console.log("✅ Sending product data:", productData);
 
       try {
-        const res = await fetch("https://apeila-me.vercel.app/api/products/create", {
+        const res = await fetch("http://localhost:3000/api/products/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(productData),

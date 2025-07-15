@@ -1,5 +1,4 @@
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function OPTIONS() {
@@ -74,16 +73,28 @@ export async function POST(request) {
       views: 0,
       rating: 0,
       reviewsCount: 0,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      // createdAt: serverTimestamp(), // Supabase handles this automatically if default value is set
+      // updatedAt: serverTimestamp(), // Supabase handles this automatically if default value is set
       published: false,
       status: 'draft',
     };
 
-    const docRef = await addDoc(collection(db, 'products'), productWithMeta);
+    const { data, error } = await supabase
+      .from('products')
+      .insert(productWithMeta)
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Error creating product in Supabase:', error);
+      return Response.json(
+        errorResponse('Server error while creating product'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
-      successResponse({ id: docRef.id }, 'Product created successfully!'),
+      successResponse({ id: data.id }, 'Product created successfully!'),
       { status: 201 }
     );
   } catch (error) {
@@ -94,3 +105,5 @@ export async function POST(request) {
     );
   }
 }
+
+

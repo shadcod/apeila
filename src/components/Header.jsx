@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -6,8 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@context/AppContext'; // عدل المسار حسب بنية مشروعك
 
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 
 export default function Header() {
   const { cartItems, favorites, toggleCart } = useAppContext();
@@ -51,11 +51,17 @@ export default function Header() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
-        const productsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setProducts(productsData);
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+
+        if (error) {
+          console.error('فشل تحميل المنتجات من Supabase:', error);
+          throw error;
+        }
+        setProducts(data);
       } catch (error) {
-        console.error('فشل تحميل المنتجات من فايرباس:', error);
+        console.error('فشل تحميل المنتجات:', error);
       }
     };
     fetchProducts();
@@ -127,10 +133,6 @@ export default function Header() {
               autoComplete="off"
             />
 
-            <button type="submit" aria-label="Search">
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </button>
-
             {searchKeyword && filteredProducts.length > 0 && (
               <div className="search-results">
                 {filteredProducts.map(product => (
@@ -174,7 +176,7 @@ export default function Header() {
               <i className="fa-solid fa-cart-arrow-down"></i>
               {totalItems > 0 && (
                 <span className="count count_item_header">{totalItems}</span>
-              )}
+                )}
             </div>
           </div>
         </div>
@@ -228,3 +230,5 @@ export default function Header() {
     </header>
   );
 }
+
+

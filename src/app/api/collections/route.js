@@ -1,14 +1,19 @@
-import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const querySnapshot = await getDocs(collection(db, 'collections'));
-    const data = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const { data, error } = await supabase
+      .from('collections')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching collections from Supabase:', error);
+      return Response.json(
+        errorResponse('Failed to retrieve collections'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
       successResponse(data, 'Collections retrieved successfully'),
@@ -17,7 +22,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching collections:', error);
     return Response.json(
-      errorResponse('Failed to read collections'),
+      errorResponse('Failed to retrieve collections'),
       { status: 500 }
     );
   }
@@ -35,20 +40,31 @@ export async function POST(req) {
       );
     }
 
-    const docRef = await addDoc(collection(db, 'collections'), {
-      ...newItem,
-      createdAt: serverTimestamp(),
-    });
+    const { data, error } = await supabase
+      .from('collections')
+      .insert({
+        ...newItem,
+        // Supabase handles createdAt automatically if default value is set in table schema
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Error creating collection in Supabase:', error);
+      return Response.json(
+        errorResponse('Failed to save collection'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
-      successResponse({ id: docRef.id }, 'Collection created successfully'),
+      successResponse({ id: data.id }, 'Collection created successfully'),
       { status: 201 }
     );
   } catch (error) {
     console.error('Error saving collection:', error);
-    return Response.json(
-      errorResponse('Failed to save collection'),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: 'Server error while saving collection' }), { status: 500 });
   }
 }
+
+

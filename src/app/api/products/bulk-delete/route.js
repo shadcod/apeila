@@ -1,4 +1,4 @@
-import admin from '@/lib/firebaseAdmin';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(req) {
   try {
@@ -15,12 +15,21 @@ export async function POST(req) {
       );
     }
 
-    const db = admin.firestore();
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .in('id', ids);
 
-    // حذف جميع المنتجات بالتوازي لتحسين الأداء
-    await Promise.all(
-      ids.map((id) => db.collection('products').doc(id).delete())
-    );
+    if (error) {
+      console.error('Error deleting products from Supabase:', error);
+      return new Response(
+        JSON.stringify({ message: 'Failed to delete products', error: error.message }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({ message: 'Products deleted successfully' }),
@@ -34,7 +43,7 @@ export async function POST(req) {
   } catch (error) {
     console.error('Error deleting products:', error);
     return new Response(
-      JSON.stringify({ message: 'Failed to delete products', error: error.message }),
+      JSON.stringify({ message: 'Server error while deleting products' }),
       {
         status: 500,
         headers: {
@@ -44,3 +53,5 @@ export async function POST(req) {
     );
   }
 }
+
+

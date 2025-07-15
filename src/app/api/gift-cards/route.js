@@ -1,14 +1,19 @@
-import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
-    const querySnapshot = await getDocs(collection(db, 'giftCards'));
-    const data = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const { data, error } = await supabase
+      .from('giftCards')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching gift cards from Supabase:', error);
+      return Response.json(
+        errorResponse('Failed to retrieve gift cards'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
       successResponse(data, 'Gift cards retrieved successfully'),
@@ -17,7 +22,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching gift cards:', error);
     return Response.json(
-      errorResponse('Failed to read gift cards'),
+      errorResponse('Failed to retrieve gift cards'),
       { status: 500 }
     );
   }
@@ -35,20 +40,31 @@ export async function POST(req) {
       );
     }
 
-    const docRef = await addDoc(collection(db, 'giftCards'), {
-      ...newItem,
-      createdAt: serverTimestamp(),
-    });
+    const { data, error } = await supabase
+      .from('giftCards')
+      .insert({
+        ...newItem,
+        // Supabase handles createdAt automatically if default value is set in table schema
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Error creating gift card in Supabase:', error);
+      return Response.json(
+        errorResponse('Failed to save gift card'),
+        { status: 500 }
+      );
+    }
 
     return Response.json(
-      successResponse({ id: docRef.id }, 'Gift card created successfully'),
+      successResponse({ id: data.id }, 'Gift card created successfully'),
       { status: 201 }
     );
   } catch (error) {
     console.error('Error saving gift card:', error);
-    return Response.json(
-      errorResponse('Failed to save gift card'),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: 'Server error while saving gift card' }), { status: 500 });
   }
 }
+
+
