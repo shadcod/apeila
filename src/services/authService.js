@@ -1,69 +1,75 @@
 import { supabase } from '@/lib/supabase'
+import Cookies from 'js-cookie'
 
-// تسجيل مستخدم جديد بالبريد وكلمة المرور مع دعم redirectTo
-export async function signUp({ email, password, redirectTo }) {
+export async function signUp({ email, password }) {
   const { data, error } = await supabase.auth.signUp(
     { email, password },
-    { redirectTo }
+    {
+      emailRedirectTo: window.location.origin + '/auth/callback',
+    }
   )
   if (error) throw error
-  return data // يحتوي على user وجلسة (session) أحيانًا
+  return data.user
 }
 
-// تسجيل الدخول بالبريد وكلمة المرور + التحقق من وجود بروفايل
 export async function signIn({ email, password }) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) throw error
-
-  const user = data.user
-
-  // التحقق من وجود بروفايل للمستخدم
-  const { data: existingProfile, error: profileFetchError } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-
-  if (profileFetchError && profileFetchError.code !== 'PGRST116') {
-    throw profileFetchError
-  }
-
-  if (!existingProfile) {
-    const { error: profileInsertError } = await supabase
-      .from('profiles')
-      .insert({
-        id: user.id,
-        avatar_url: '',
-      })
-
-    if (profileInsertError) throw profileInsertError
-  }
-
-  return user
+  return data.user
 }
 
-// تسجيل الدخول عبر Google OAuth مع دعم redirectTo اختياري
-export async function signInWithGoogle(redirectTo) {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectTo || `${window.location.origin}/dashboard`,
-    },
-  })
-
-  if (error) throw error
-  return data
-}
-
-// تسجيل الخروج
 export async function signOut() {
   const { error } = await supabase.auth.signOut()
   if (error) throw error
 }
 
-// الحصول على المستخدم الحالي (أو null إذا لم يكن مسجل دخول)
 export async function getCurrentUser() {
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
+}
+
+export async function signInWithGoogle() {
+  // قراءة رابط العودة من الكوكيز ثم حذفه
+  const redirectPath = Cookies.get('redirectAfterLogin') || ''
+  Cookies.remove('redirectAfterLogin')
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin + '/auth/callback' + (redirectPath ? `?redirect=${redirectPath}` : ''),
+    },
+  })
   if (error) throw error
-  return user || null
+  return data
+}
+
+export async function resetPasswordForEmail(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/update-password',
+  })
+  if (error) throw error
+}
+
+export async function updatePassword(newPassword) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) throw error
+}
+
+export async function getRedirectAfterLogin(defaultRedirect = '/') {
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error || !user) return defaultRedirect
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profileError) return defaultRedirect
+
+  if (profile.role === 'admin') {
+    return '/dashboard'
+  }
+
+  return defaultRedirect
 }

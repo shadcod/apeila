@@ -1,22 +1,24 @@
-
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase'; // تأكد أن المسار صحيح
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  // 🛒 الحالة (state)
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const { user, loading, isAuthenticated } = useAuth();
+
+  // فقط شغّل مرة واحدة لجلب بيانات المستخدم أو إعدادات خاصة إذا لازم
+  // إذا تريد تحميل بيانات إضافية للمستخدم يمكن فعلها هنا
 
   const toggleCart = () => setIsCartOpen(prev => !prev);
 
-  // 🔐 لتخزين البيانات في localStorage
   const safeSet = (key, value) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(key, JSON.stringify(value));
@@ -31,19 +33,12 @@ export function AppProvider({ children }) {
     return null;
   };
 
-  // 🔥 تحميل المنتجات من Supabase
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*');
-
-        if (error) {
-          console.error('Failed to load products from Supabase:', error);
-          throw error;
-        }
-        setProducts(data);
+        const { data, error } = await supabase.from('products').select('*');
+        if (error) throw error;
+        setProducts(data || []);
       } catch (error) {
         console.error('Failed to load products:', error);
       }
@@ -51,7 +46,6 @@ export function AppProvider({ children }) {
     fetchProducts();
   }, []);
 
-  // 🗂️ تحميل cart و favorites من localStorage
   useEffect(() => {
     const savedCart = safeGet('cart');
     const savedFavorites = safeGet('favorites');
@@ -59,37 +53,33 @@ export function AppProvider({ children }) {
     if (savedFavorites) setFavorites(savedFavorites);
   }, []);
 
-  // 💾 حفظ cart و favorites في localStorage عند التغيير
   useEffect(() => safeSet('cart', cartItems), [cartItems]);
   useEffect(() => safeSet('favorites', favorites), [favorites]);
 
-  // ➕ إضافة منتج إلى السلة
   const addToCart = (product, quantity = 1) => {
-    setCartItems((prev) => {
+    setCartItems(prev => {
       const existingItem = prev.find(
-        (item) =>
+        item =>
           item.id === product.id &&
           item.selectedColor?.name === product.selectedColor?.name &&
           item.selectedSize === product.selectedSize
       );
 
       if (existingItem) {
-        return prev.map((item) =>
+        return prev.map(item =>
           item === existingItem
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-
       return [...prev, { ...product, quantity }];
     });
   };
 
-  // ❌ إزالة منتج من السلة
   const removeFromCart = (product) => {
-    setCartItems((prev) =>
+    setCartItems(prev =>
       prev.filter(
-        (item) =>
+        item =>
           !(
             item.id === product.id &&
             item.selectedColor?.name === product.selectedColor?.name &&
@@ -99,10 +89,9 @@ export function AppProvider({ children }) {
     );
   };
 
-  // 🔁 تحديث كمية منتج معين
   const updateQuantity = (product, newQty) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
+    setCartItems(prev =>
+      prev.map(item =>
         item.id === product.id &&
         item.selectedColor?.name === product.selectedColor?.name &&
         item.selectedSize === product.selectedSize
@@ -112,19 +101,17 @@ export function AppProvider({ children }) {
     );
   };
 
-  // ⬆️ زيادة الكمية حسب ID
   const increaseQuantity = (id) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
+    setCartItems(prev =>
+      prev.map(item =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   };
 
-  // ⬇️ تقليل الكمية حسب ID
   const decreaseQuantity = (id) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
+    setCartItems(prev =>
+      prev.map(item =>
         item.id === id && item.quantity > 1
           ? { ...item, quantity: item.quantity - 1 }
           : item
@@ -132,26 +119,23 @@ export function AppProvider({ children }) {
     );
   };
 
-  // ❤️ إدارة المفضلة
   const toggleFavorite = (product) => {
-    setFavorites((prev) => {
-      const exists = prev.some((item) => item.id === product.id);
+    setFavorites(prev => {
+      const exists = prev.some(item => item.id === product.id);
       return exists
-        ? prev.filter((item) => item.id !== product.id)
+        ? prev.filter(item => item.id !== product.id)
         : [...prev, product];
     });
   };
 
   const isFavorite = (productId) =>
-    favorites.some((item) => item.id === productId);
+    favorites.some(item => item.id === productId);
 
-  // 💰 حساب السعر الكلي
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
-  // ✅ نشر كل القيم في الـ context
   return (
     <AppContext.Provider
       value={{
@@ -159,7 +143,8 @@ export function AppProvider({ children }) {
         cartItems,
         favorites,
         isAuthenticated,
-        setIsAuthenticated,
+        user,
+        loading,
         addToCart,
         removeFromCart,
         updateQuantity,
@@ -184,5 +169,3 @@ export function useAppContext() {
   }
   return context;
 }
-
-

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Charts from '@components/dashboard/Charts';
-import useAuth from '@/hooks/useAuth'; // استدعاء الـ hook حسب المسار
+import { useAuth } from '@/hooks/useAuth'
+ // استدعاء الـ hook حسب المسار
 
 export default function DashboardPage() {
   const router = useRouter();

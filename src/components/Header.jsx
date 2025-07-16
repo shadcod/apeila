@@ -1,30 +1,31 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import useAuth from '@/hooks/useAuth';
-import { useAppContext } from '@/context/AppContext';
-import { supabase } from '@/lib/supabase';
+import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useAppContext } from '@context/AppContext'
+import { supabase } from '@/lib/supabase'
+import { getCurrentUser, signOut } from '@/services/authService'
 
 export default function Header() {
-  const { cartItems, favorites, toggleCart } = useAppContext();
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { cartItems, favorites, toggleCart, isAuthenticated } = useAppContext()
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0)
+  const totalFavorites = favorites.length
+  const router = useRouter()
 
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const totalFavorites = favorites.length;
-  const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [categoryOpen, setCategoryOpen] = useState(false)
+  const [searchKeyword, setSearchKeyword] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('All Category')
+  const [products, setProducts] = useState([])
+  const [filteredProducts, setFilteredProducts] = useState([])
+  const [user, setUser] = useState(null)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [categoryOpen, setCategoryOpen] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Category');
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-
-  const categoryRef = useRef(null);
-  const searchRef = useRef(null);
+  const categoryRef = useRef(null)
+  const searchRef = useRef(null)
+  const profileMenuRef = useRef(null)
 
   const categories = [
     "Top 10 Offers",
@@ -34,80 +35,93 @@ export default function Header() {
     "Telivsion & Monitor",
     "Jewelry & Watches",
     "Toys & Hobbies"
-  ];
+  ]
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (categoryRef.current && !categoryRef.current.contains(event.target)) {
-        setCategoryOpen(false);
+        setCategoryOpen(false)
       }
       if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setSearchKeyword('');
+        setSearchKeyword('')
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*');
-
-        if (error) {
-          console.error('فشل تحميل المنتجات من Supabase:', error);
-          throw error;
-        }
-        setProducts(data);
+        const { data, error } = await supabase.from('products').select('*')
+        if (error) throw error
+        setProducts(data)
       } catch (error) {
-        console.error('فشل تحميل المنتجات:', error);
+        console.error('Failed to load products:', error)
       }
-    };
-    fetchProducts();
-  }, []);
+    }
+    fetchProducts()
+  }, [])
 
   useEffect(() => {
     if (searchKeyword.trim() === '') {
-      setFilteredProducts([]);
-      return;
+      setFilteredProducts([])
+      return
     }
     const results = products.filter(product =>
       product.name.toLowerCase().includes(searchKeyword.toLowerCase())
-    );
-    setFilteredProducts(results.slice(0, 5));
-  }, [searchKeyword, products]);
+    )
+    setFilteredProducts(results.slice(0, 5))
+  }, [searchKeyword, products])
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    const trimmed = searchKeyword.trim();
-    if (!trimmed) return;
-    router.push(`/search?query=${encodeURIComponent(trimmed)}`);
-    setSearchKeyword('');
-  };
+  useEffect(() => {
+    const checkUser = async () => {
+      const currentUser = await getCurrentUser()
+      setUser(currentUser)
+    }
+    checkUser()
 
-  const toggleMenu = () => setMenuOpen(prev => !prev);
-  const toggleCategory = () => setCategoryOpen(prev => !prev);
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+    })
 
-  const handleProductClick = () => {
-    setSearchKeyword('');
-  };
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [])
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
-      setIsAuthenticated(false);
-      router.push('/login');
+      await signOut()
+      router.push('/login')
     } catch (error) {
-      console.error('Failed to logout:', error);
+      alert(error.message)
     }
-  };
+  }
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault()
+    const trimmed = searchKeyword.trim()
+    if (!trimmed) return
+    router.push(`/search?query=${encodeURIComponent(trimmed)}`)
+    setSearchKeyword('')
+  }
+
+  const toggleMenu = () => setMenuOpen(prev => !prev)
+  const toggleCategory = () => setCategoryOpen(prev => !prev)
+  const handleProductClick = () => setSearchKeyword('')
+  const toggleProfileMenu = () => setProfileMenuOpen(prev => !prev)
+
+  const userName = user?.user_metadata?.name || user?.email
+  const profileImage = user?.user_metadata?.avatar_url || '/img/default-avatar.png'
 
   return (
     <header className="Header">
       <div className="top_header">
-        <div className="container flex items-center justify-between">
+        <div className="container">
           <Link href="/" className="logo">
             <Image 
               src="/img/logo.png" 
@@ -119,14 +133,13 @@ export default function Header() {
             />
           </Link>
 
-          <form className="search_box flex-1 mx-6 relative" onSubmit={handleSearchSubmit} ref={searchRef}>
-            <div className="select_box inline-block mr-2">
+          <form className="search_box" onSubmit={handleSearchSubmit} ref={searchRef}>
+            <div className="select_box">
               <select
                 id="category"
                 name="category"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="border rounded px-2 py-1"
               >
                 <option value="All Category">All categories</option>
                 {categories.map((cat, index) => (
@@ -139,23 +152,22 @@ export default function Header() {
               type="text"
               name="search"
               id="search"
-              placeholder="Search for Apeila"
+              placeholder="search for Apeila"
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               autoComplete="off"
-              className="border rounded px-3 py-2 w-full"
             />
 
             {searchKeyword && filteredProducts.length > 0 && (
-              <div className="search-results absolute bg-white border rounded shadow-md z-50 mt-1 w-full max-w-md">
+              <div className="search-results">
                 {filteredProducts.map(product => (
                   <Link
                     href={`/product/${product.id}`}
                     key={product.id}
-                    className="search-result-item flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+                    className="search-result-item"
                     onClick={handleProductClick}
                   >
-                    <div className="search-result-img flex-shrink-0 mr-3">
+                    <div className="search-result-img">
                       <Image
                         src={product.img}
                         alt={product.name}
@@ -166,8 +178,8 @@ export default function Header() {
                       />
                     </div>
                     <div className="search-result-info">
-                      <h4 className="text-sm font-semibold">{product.name}</h4>
-                      <p className="text-sm text-gray-600">${product.price}</p>
+                      <h4>{product.name}</h4>
+                      <p>${product.price}</p>
                     </div>
                   </Link>
                 ))}
@@ -175,142 +187,103 @@ export default function Header() {
             )}
           </form>
 
-          <div className="header_icons flex items-center space-x-4">
-            <div className="icon relative">
-              <Link href="/favorites" aria-label="Favorites" className="relative">
-                <i className="fa-regular fa-heart text-xl"></i>
+          <div className="header_icons">
+            <div className="icon">
+              <Link href="/favorites" aria-label="Favorites">
+                <i className="fa-regular fa-heart"></i>
                 {totalFavorites > 0 && (
-                  <span className="count count_favourite absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1">
-                    {totalFavorites}
-                  </span>
+                  <span className="count count_favourite">{totalFavorites}</span>
                 )}
               </Link>
             </div>
 
-            <div
-              className="icon relative cursor-pointer"
-              onClick={toggleCart}
-              role="button"
-              tabIndex={0}
-              aria-label="Toggle Cart"
-            >
-              <i className="fa-solid fa-cart-arrow-down text-xl"></i>
+            <div className="icon" onClick={toggleCart} role="button" tabIndex={0} aria-label="Toggle Cart">
+              <i className="fa-solid fa-cart-arrow-down"></i>
               {totalItems > 0 && (
-                <span className="count count_item_header absolute top-0 right-0 bg-blue-600 text-white rounded-full text-xs px-1">
-                  {totalItems}
-                </span>
+                <span className="count count_item_header">{totalItems}</span>
               )}
             </div>
-
-            {isAuthenticated ? (
-              <div className="user-controls flex items-center space-x-4 ml-6">
-                <Link href="/dashboard" className="btn text-sm font-medium">
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="btn text-sm font-medium bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="login_signup btns flex items-center space-x-4 ml-6">
-                <Link href="/login" className="btn text-sm font-medium">
-                  Login <i className="fa-solid fa-right-to-bracket ml-1"></i>
-                </Link>
-                <Link href="/signup" className="btn text-sm font-medium">
-                  Sign up <i className="fa-solid fa-user-plus ml-1"></i>
-                </Link>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      <div className="bottom_header bg-gray-100">
-        <div className="container flex items-center justify-between">
-          <nav className="nav flex items-center space-x-6">
-            <span
-              className="open_menu cursor-pointer"
-              onClick={toggleMenu}
-              role="button"
-              tabIndex={0}
-              aria-label="Toggle Menu"
-            >
-              <i className="fa-solid fa-bars text-2xl"></i>
+      <div className="bottom_header">
+        <div className="container">
+          <nav className="nav">
+            <span className="open_menu" onClick={toggleMenu} role="button" tabIndex={0} aria-label="Toggle Menu">
+              <i className="fa-solid fa-bars"></i>
             </span>
 
-            <div className="category_nav relative" ref={categoryRef}>
-              <div
-                onClick={toggleCategory}
-                className="category_btn flex items-center cursor-pointer select-none"
-                role="button"
-                tabIndex={0}
-                aria-label="Browse Categories"
-              >
-                <i className="fa-solid fa-bars mr-2"></i>
-                <p className="mr-2">{selectedCategory}</p>
-                <i
-                  className={`fa-solid fa-angle-down transition-transform ${
-                    categoryOpen ? 'rotate-180' : ''
-                  }`}
-                ></i>
+            <div className="category_nav" ref={categoryRef}>
+              <div onClick={toggleCategory} className="category_btn" role="button" tabIndex={0} aria-label="Browse Categories">
+                <i className="fa-solid fa-bars"></i>
+                <p>Browse category</p>
+                <i className={`fa-solid fa-angle-down ${categoryOpen ? 'rotate' : ''}`}></i>
               </div>
 
               {categoryOpen && (
-                <div className="category_nav_list absolute bg-white border rounded shadow-md mt-2 z-40 min-w-[200px]">
+                <div className={`category_nav_list ${categoryOpen ? 'active' : ''}`}>
                   {categories.map((cat, index) => (
-                    <a
-                      href="#"
-                      key={index}
-                      className="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setSelectedCategory(cat);
-                        setCategoryOpen(false);
-                      }}
-                    >
-                      {cat}
-                    </a>
+                    <a href="#" key={index}>{cat}</a>
                   ))}
                 </div>
               )}
             </div>
 
-            <ul
-              className={`nav_links flex space-x-6 ${
-                menuOpen ? 'block absolute top-full left-0 w-full bg-white p-4 shadow-lg' : 'hidden md:flex'
-              }`}
-            >
-              <span
-                className="close_menu cursor-pointer mb-2"
-                onClick={toggleMenu}
-                role="button"
-                tabIndex={0}
-                aria-label="Close Menu"
-              >
-                <i className="fa-solid fa-circle-xmark text-2xl"></i>
+            <ul className={`nav_links ${menuOpen ? 'active' : ''}`}>
+              <span className="close_menu" onClick={toggleMenu} role="button" tabIndex={0} aria-label="Close Menu">
+                <i className="fa-solid fa-circle-xmark"></i>
               </span>
-              <li className="active">
-                <Link href="/">Home</Link>
-              </li>
-              <li>
-                <Link href="/about">About</Link>
-              </li>
-              <li>
-                <Link href="/accessories">Accessories</Link>
-              </li>
-              <li>
-                <Link href="/blog">Blog</Link>
-              </li>
-              <li>
-                <Link href="/contact">Contact</Link>
-              </li>
+              <li className="active"><Link href="/">Home</Link></li>
+              <li><Link href="#">About</Link></li>
+              <li><Link href="#">Accessories</Link></li>
+              <li><Link href="#">Blog</Link></li>
+              <li><Link href="#">Contact</Link></li>
             </ul>
           </nav>
+
+          <div className="login_signup btns" ref={profileMenuRef}>
+            {isAuthenticated ? (
+              <>
+                <button
+                  onClick={toggleProfileMenu}
+                  className="profile-btn"
+                  aria-haspopup="true"
+                  aria-expanded={profileMenuOpen}
+                >
+                  <Image
+                    src={profileImage}
+                    alt="User Profile"
+                    width={35}
+                    height={35}
+                    style={{ borderRadius: '50%', objectFit: 'cover' }}
+                    priority
+                  />
+                </button>
+
+                {profileMenuOpen && (
+                  <ul className="profile-menu">
+                    <li className="profile-username">Hello, {userName}</li>
+                    <li><Link href="/account">My Account</Link></li>
+                    <li><Link href="/orders">Orders</Link></li>
+                    <li><Link href="/settings">Settings</Link></li>
+                    <li><button onClick={handleLogout}>Logout</button></li>
+                  </ul>
+                )}
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="btn">
+                  Login <i className="fa-solid fa-right-to-bracket"></i>
+                </Link>
+                <Link href="/signup" className="btn">
+                  Sign up <i className="fa-solid fa-user-plus"></i>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
-  );
+  )
 }

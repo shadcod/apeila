@@ -9,6 +9,7 @@ const nextConfig = {
       'gw.alicdn.com',
       'cbu01.alicdn.com',
       'ae-pic-a1.aliexpress-media.com',
+      'lh3.googleusercontent.com', // ← أضفنا هذا
     ],
   },
 };
