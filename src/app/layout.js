@@ -2,6 +2,8 @@ import { Inter } from 'next/font/google';
 import '@styles/globals.css';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -30,7 +32,10 @@ export default function RootLayout({ children }) {
       </head>
       <body className={inter.className}>
         {children}
+        <ToastContainer position="bottom-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
       </body>
     </html>
   );
 }
+
+

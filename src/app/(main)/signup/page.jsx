@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { signUp, signInWithGoogle } from '@/services/authService'
 import { useRouter } from 'next/navigation'
+import useAuth from '@/hooks/useAuth' // تعديل هنا لاستخدام hook المخصص
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -11,6 +12,7 @@ export default function SignupPage() {
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const router = useRouter()
+  const { setIsAuthenticated } = useAuth() // استخدام hook المخصص
 
   const validateEmail = (email) => {
     return /\S+@\S+\.\S+/.test(email)
@@ -33,12 +35,18 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
-      await signUp({ email, password })
-      setSuccessMessage('Account created! Please check your email to verify.')
+      const data = await signUp({ email, password })
       
-      // بعد التسجيل نرسل المستخدم إلى صفحة تأكيد البريد
-      // أو يمكن إعادة التوجيه مباشرة إلى dashboard أو login حسب الحاجة
-      // router.push('/login')
+      // تحقق من وجود التحقق من البريد في supabase
+      if (!data.session) {
+        setSuccessMessage('Account created! Please check your email to verify.')
+        setIsAuthenticated(false) // لم يتم تفعيل الحساب بعد
+        // يمكن توجيه المستخدم لصفحة تعليمات التحقق أو صفحة تسجيل الدخول
+        router.push('/login')
+      } else {
+        setIsAuthenticated(true)
+        router.push('/dashboard')
+      }
     } catch (error) {
       setErrorMessage(error.message || 'Failed to sign up. Please try again.')
     } finally {
@@ -52,11 +60,12 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
-      await signInWithGoogle()
-      // بعد تسجيل Google الناجح نعيد التوجيه تلقائيًا حسب إعدادات Supabase
-      router.push('/dashboard')
+      await signInWithGoogle(`${window.location.origin}/dashboard`)
+      // Supabase سيعيد التوجيه تلقائياً بعد نجاح Google OAuth
+      setIsAuthenticated(true)
     } catch (error) {
       setErrorMessage(error.message || 'Google sign-in failed. Please try again.')
+      setIsAuthenticated(false)
     } finally {
       setLoading(false)
     }

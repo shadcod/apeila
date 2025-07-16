@@ -1,9 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Charts from '@components/dashboard/Charts';
+import useAuth from '@/hooks/useAuth'; // استدعاء الـ hook حسب المسار
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
+
   const [dashboardData, setDashboardData] = useState({
     salesData: [],
     ordersByChannel: [],
@@ -19,6 +24,13 @@ export default function DashboardPage() {
     newCustomers: 0,
   });
 
+  // توجيه المستخدم لصفحة تسجيل الدخول إذا لم يكن مسجلاً
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -30,8 +42,11 @@ export default function DashboardPage() {
       }
     }
 
-    fetchData();
-  }, []);
+    // فقط نحمل البيانات إذا المستخدم مسجل دخول
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [isAuthenticated]);
 
   return (
     <div>

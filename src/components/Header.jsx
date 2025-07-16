@@ -1,16 +1,17 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useAppContext } from '@context/AppContext'; // عدل المسار حسب بنية مشروعك
-
+import useAuth from '@/hooks/useAuth';
+import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase';
 
 export default function Header() {
   const { cartItems, favorites, toggleCart } = useAppContext();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
+
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const totalFavorites = favorites.length;
   const router = useRouter();
@@ -93,10 +94,20 @@ export default function Header() {
     setSearchKeyword('');
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      router.push('/login');
+    } catch (error) {
+      console.error('Failed to logout:', error);
+    }
+  };
+
   return (
     <header className="Header">
       <div className="top_header">
-        <div className="container">
+        <div className="container flex items-center justify-between">
           <Link href="/" className="logo">
             <Image 
               src="/img/logo.png" 
@@ -108,13 +119,14 @@ export default function Header() {
             />
           </Link>
 
-          <form className="search_box" onSubmit={handleSearchSubmit} ref={searchRef}>
-            <div className="select_box">
+          <form className="search_box flex-1 mx-6 relative" onSubmit={handleSearchSubmit} ref={searchRef}>
+            <div className="select_box inline-block mr-2">
               <select
                 id="category"
                 name="category"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
+                className="border rounded px-2 py-1"
               >
                 <option value="All Category">All categories</option>
                 {categories.map((cat, index) => (
@@ -127,22 +139,23 @@ export default function Header() {
               type="text"
               name="search"
               id="search"
-              placeholder="search for Apeila"
+              placeholder="Search for Apeila"
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               autoComplete="off"
+              className="border rounded px-3 py-2 w-full"
             />
 
             {searchKeyword && filteredProducts.length > 0 && (
-              <div className="search-results">
+              <div className="search-results absolute bg-white border rounded shadow-md z-50 mt-1 w-full max-w-md">
                 {filteredProducts.map(product => (
                   <Link
                     href={`/product/${product.id}`}
                     key={product.id}
-                    className="search-result-item"
+                    className="search-result-item flex items-center p-2 hover:bg-gray-100 cursor-pointer"
                     onClick={handleProductClick}
                   >
-                    <div className="search-result-img">
+                    <div className="search-result-img flex-shrink-0 mr-3">
                       <Image
                         src={product.img}
                         alt={product.name}
@@ -153,8 +166,8 @@ export default function Header() {
                       />
                     </div>
                     <div className="search-result-info">
-                      <h4>{product.name}</h4>
-                      <p>${product.price}</p>
+                      <h4 className="text-sm font-semibold">{product.name}</h4>
+                      <p className="text-sm text-gray-600">${product.price}</p>
                     </div>
                   </Link>
                 ))}
@@ -162,73 +175,142 @@ export default function Header() {
             )}
           </form>
 
-          <div className="header_icons">
-            <div className="icon">
-              <Link href="/favorites" aria-label="Favorites">
-                <i className="fa-regular fa-heart"></i>
+          <div className="header_icons flex items-center space-x-4">
+            <div className="icon relative">
+              <Link href="/favorites" aria-label="Favorites" className="relative">
+                <i className="fa-regular fa-heart text-xl"></i>
                 {totalFavorites > 0 && (
-                  <span className="count count_favourite">{totalFavorites}</span>
+                  <span className="count count_favourite absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1">
+                    {totalFavorites}
+                  </span>
                 )}
               </Link>
             </div>
 
-            <div className="icon" onClick={toggleCart} role="button" tabIndex={0} aria-label="Toggle Cart">
-              <i className="fa-solid fa-cart-arrow-down"></i>
+            <div
+              className="icon relative cursor-pointer"
+              onClick={toggleCart}
+              role="button"
+              tabIndex={0}
+              aria-label="Toggle Cart"
+            >
+              <i className="fa-solid fa-cart-arrow-down text-xl"></i>
               {totalItems > 0 && (
-                <span className="count count_item_header">{totalItems}</span>
-                )}
+                <span className="count count_item_header absolute top-0 right-0 bg-blue-600 text-white rounded-full text-xs px-1">
+                  {totalItems}
+                </span>
+              )}
             </div>
+
+            {isAuthenticated ? (
+              <div className="user-controls flex items-center space-x-4 ml-6">
+                <Link href="/dashboard" className="btn text-sm font-medium">
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="btn text-sm font-medium bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="login_signup btns flex items-center space-x-4 ml-6">
+                <Link href="/login" className="btn text-sm font-medium">
+                  Login <i className="fa-solid fa-right-to-bracket ml-1"></i>
+                </Link>
+                <Link href="/signup" className="btn text-sm font-medium">
+                  Sign up <i className="fa-solid fa-user-plus ml-1"></i>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="bottom_header">
-        <div className="container">
-          <nav className="nav">
-            <span className="open_menu" onClick={toggleMenu} role="button" tabIndex={0} aria-label="Toggle Menu">
-              <i className="fa-solid fa-bars"></i>
+      <div className="bottom_header bg-gray-100">
+        <div className="container flex items-center justify-between">
+          <nav className="nav flex items-center space-x-6">
+            <span
+              className="open_menu cursor-pointer"
+              onClick={toggleMenu}
+              role="button"
+              tabIndex={0}
+              aria-label="Toggle Menu"
+            >
+              <i className="fa-solid fa-bars text-2xl"></i>
             </span>
 
-            <div className="category_nav" ref={categoryRef}>
-              <div onClick={toggleCategory} className="category_btn" role="button" tabIndex={0} aria-label="Browse Categories">
-                <i className="fa-solid fa-bars"></i>
-                <p>Browse category</p>
-                <i className={`fa-solid fa-angle-down ${categoryOpen ? 'rotate' : ''}`}></i>
+            <div className="category_nav relative" ref={categoryRef}>
+              <div
+                onClick={toggleCategory}
+                className="category_btn flex items-center cursor-pointer select-none"
+                role="button"
+                tabIndex={0}
+                aria-label="Browse Categories"
+              >
+                <i className="fa-solid fa-bars mr-2"></i>
+                <p className="mr-2">{selectedCategory}</p>
+                <i
+                  className={`fa-solid fa-angle-down transition-transform ${
+                    categoryOpen ? 'rotate-180' : ''
+                  }`}
+                ></i>
               </div>
 
               {categoryOpen && (
-                <div className={`category_nav_list ${categoryOpen ? 'active' : ''}`}>
+                <div className="category_nav_list absolute bg-white border rounded shadow-md mt-2 z-40 min-w-[200px]">
                   {categories.map((cat, index) => (
-                    <a href="#" key={index}>{cat}</a>
+                    <a
+                      href="#"
+                      key={index}
+                      className="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedCategory(cat);
+                        setCategoryOpen(false);
+                      }}
+                    >
+                      {cat}
+                    </a>
                   ))}
                 </div>
               )}
             </div>
 
-            <ul className={`nav_links ${menuOpen ? 'active' : ''}`}>
-              <span className="close_menu" onClick={toggleMenu} role="button" tabIndex={0} aria-label="Close Menu">
-                <i className="fa-solid fa-circle-xmark"></i>
+            <ul
+              className={`nav_links flex space-x-6 ${
+                menuOpen ? 'block absolute top-full left-0 w-full bg-white p-4 shadow-lg' : 'hidden md:flex'
+              }`}
+            >
+              <span
+                className="close_menu cursor-pointer mb-2"
+                onClick={toggleMenu}
+                role="button"
+                tabIndex={0}
+                aria-label="Close Menu"
+              >
+                <i className="fa-solid fa-circle-xmark text-2xl"></i>
               </span>
-              <li className="active"><Link href="/">Home</Link></li>
-              <li><Link href="#">About</Link></li>
-              <li><Link href="#">Accessories</Link></li>
-              <li><Link href="#">Blog</Link></li>
-              <li><Link href="#">Contact</Link></li>
+              <li className="active">
+                <Link href="/">Home</Link>
+              </li>
+              <li>
+                <Link href="/about">About</Link>
+              </li>
+              <li>
+                <Link href="/accessories">Accessories</Link>
+              </li>
+              <li>
+                <Link href="/blog">Blog</Link>
+              </li>
+              <li>
+                <Link href="/contact">Contact</Link>
+              </li>
             </ul>
           </nav>
-
-          <div className="login_signup btns">
-            <Link href="#" className="btn">
-              Login <i className="fa-solid fa-right-to-bracket"></i>
-            </Link>
-            <Link href="#" className="btn">
-              Sign up <i className="fa-solid fa-user-plus"></i>
-            </Link>
-          </div>
         </div>
       </div>
     </header>
   );
 }
-
-

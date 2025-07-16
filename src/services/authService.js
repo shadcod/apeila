@@ -1,13 +1,16 @@
 import { supabase } from '@/lib/supabase'
 
-// تسجيل مستخدم جديد بالبريد وكلمة المرور
-export async function signUp({ email, password }) {
-  const { data, error } = await supabase.auth.signUp({ email, password })
+// تسجيل مستخدم جديد بالبريد وكلمة المرور مع دعم redirectTo
+export async function signUp({ email, password, redirectTo }) {
+  const { data, error } = await supabase.auth.signUp(
+    { email, password },
+    { redirectTo }
+  )
   if (error) throw error
-  return data.user
+  return data // يحتوي على user وجلسة (session) أحيانًا
 }
 
-// تسجيل الدخول بالبريد وكلمة المرور + التأكد من وجود بروفايل
+// تسجيل الدخول بالبريد وكلمة المرور + التحقق من وجود بروفايل
 export async function signIn({ email, password }) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) throw error
@@ -39,13 +42,12 @@ export async function signIn({ email, password }) {
   return user
 }
 
-// تسجيل الدخول عبر Google OAuth
-export async function signInWithGoogle() {
+// تسجيل الدخول عبر Google OAuth مع دعم redirectTo اختياري
+export async function signInWithGoogle(redirectTo) {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      // يمكن تحديد redirect URL بعد تسجيل الدخول
-      // redirectTo: `${window.location.origin}/dashboard`,
+      redirectTo: redirectTo || `${window.location.origin}/dashboard`,
     },
   })
 
@@ -59,8 +61,9 @@ export async function signOut() {
   if (error) throw error
 }
 
-// الحصول على المستخدم الحالي
+// الحصول على المستخدم الحالي (أو null إذا لم يكن مسجل دخول)
 export async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser()
-  return user
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error) throw error
+  return user || null
 }
