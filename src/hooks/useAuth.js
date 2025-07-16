@@ -17,19 +17,28 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
-  // تحقق من حالة الجلسة عند التحميل
   useEffect(() => {
     const checkUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser()
-        if (error) {
-          console.error('Error getting user:', error)
+        if (error || !user) {
           setUser(null)
+          setLoading(false)
+          return
+        }
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+
+        if (profileError) {
+          setUser({ ...user, role: null })
         } else {
-          setUser(user)
+          setUser({ ...user, role: profile.role })
         }
       } catch (error) {
-        console.error('Unexpected error:', error)
         setUser(null)
       } finally {
         setLoading(false)
@@ -38,9 +47,22 @@ export function useAuth() {
 
     checkUser()
 
-    // استمع لتغيرات حالة المصادقة (دخول/خروج)
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null)
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+
+        if (profileError) {
+          setUser({ ...session.user, role: null })
+        } else {
+          setUser({ ...session.user, role: profile.role })
+        }
+      } else {
+        setUser(null)
+      }
       setLoading(false)
     })
 
@@ -49,16 +71,13 @@ export function useAuth() {
     }
   }, [])
 
-  // تسجيل مستخدم جديد
   const handleSignUp = async (email, password) => {
     setLoading(true)
     try {
       const newUser = await signUp({ email, password })
       toast.success('Account created! Please check your email for verification if required.')
-
       const redirectTo = await getRedirectAfterLogin('/')
       router.push(redirectTo)
-
       return newUser
     } catch (error) {
       toast.error(error.message)
@@ -68,16 +87,13 @@ export function useAuth() {
     }
   }
 
-  // تسجيل دخول
   const handleSignIn = async (email, password) => {
     setLoading(true)
     try {
       const loggedInUser = await signIn({ email, password })
       toast.success('Login successful!')
-
       const redirectTo = await getRedirectAfterLogin('/')
       router.push(redirectTo)
-
       return loggedInUser
     } catch (error) {
       toast.error(error.message)
@@ -87,7 +103,6 @@ export function useAuth() {
     }
   }
 
-  // تسجيل خروج
   const handleSignOut = async () => {
     setLoading(true)
     try {
@@ -102,12 +117,10 @@ export function useAuth() {
     }
   }
 
-  // تسجيل دخول باستخدام جوجل
   const handleSignInWithGoogle = async () => {
     setLoading(true)
     try {
       await signInWithGoogle()
-      // Supabase يعيد التوجيه تلقائياً
     } catch (error) {
       toast.error(error.message)
       throw error
@@ -116,7 +129,6 @@ export function useAuth() {
     }
   }
 
-  // طلب إعادة تعيين كلمة المرور عبر البريد
   const handleResetPasswordForEmail = async (email) => {
     setLoading(true)
     try {
@@ -130,7 +142,6 @@ export function useAuth() {
     }
   }
 
-  // تحديث كلمة المرور
   const handleUpdatePassword = async (newPassword) => {
     setLoading(true)
     try {

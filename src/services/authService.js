@@ -29,7 +29,6 @@ export async function getCurrentUser() {
 }
 
 export async function signInWithGoogle() {
-  // قراءة رابط العودة من الكوكيز ثم حذفه
   const redirectPath = Cookies.get('redirectAfterLogin') || ''
   Cookies.remove('redirectAfterLogin')
 

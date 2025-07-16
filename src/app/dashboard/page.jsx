@@ -1,14 +1,13 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Charts from '@components/dashboard/Charts';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Charts from '@components/dashboard/Charts'
 import { useAuth } from '@/hooks/useAuth'
- // استدعاء الـ hook حسب المسار
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const router = useRouter()
+  const { user, isAuthenticated, loading } = useAuth()
 
   const [dashboardData, setDashboardData] = useState({
     salesData: [],
@@ -23,31 +22,37 @@ export default function DashboardPage() {
     averageOrderValue: 0,
     customerSatisfaction: 0,
     newCustomers: 0,
-  });
+  })
 
-  // توجيه المستخدم لصفحة تسجيل الدخول إذا لم يكن مسجلاً
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
+    if (!loading) {
+      if (!isAuthenticated) {
+        router.replace('/login')
+      } else if (user?.role !== 'admin') {
+        router.replace('/')
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [user, isAuthenticated, loading, router])
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
-        const res = await fetch('/data/dashboard.json');
-        const data = await res.json();
-        setDashboardData(data);
+        const res = await fetch('/data/dashboard.json')
+        const data = await res.json()
+        setDashboardData(data)
       } catch (error) {
-        console.error('Failed to fetch dashboard data', error);
+        console.error('Failed to fetch dashboard data', error)
       }
     }
 
-    // فقط نحمل البيانات إذا المستخدم مسجل دخول
-    if (isAuthenticated) {
-      fetchData();
+    if (!loading && isAuthenticated && user?.role === 'admin') {
+      fetchData()
     }
-  }, [isAuthenticated]);
+  }, [loading, isAuthenticated, user])
+
+  if (loading || !isAuthenticated || user?.role !== 'admin') {
+    return <p className="text-center mt-10">Loading...</p>
+  }
 
   return (
     <div>
@@ -59,5 +64,5 @@ export default function DashboardPage() {
         topProducts={dashboardData.topProducts}
       />
     </div>
-  );
+  )
 }

@@ -3,8 +3,6 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 
 export async function middleware(req) {
   const res = NextResponse.next()
-
-  // استخدم helper الجاهز للتعامل مع الكوكيز تلقائياً
   const supabase = createMiddlewareClient({ req, res })
 
   const {
@@ -21,7 +19,6 @@ export async function middleware(req) {
   }
 
   if (isProtected && session) {
-    // جلب role من profiles
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('role')
@@ -34,7 +31,6 @@ export async function middleware(req) {
       return NextResponse.redirect(redirectUrl)
     }
 
-    // إذا مو أدمن وحاول يروح للداشبورد
     if (req.nextUrl.pathname.startsWith('/dashboard') && profile.role !== 'admin') {
       return NextResponse.redirect(new URL('/', req.url))
     }
