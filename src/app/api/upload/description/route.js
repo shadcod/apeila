@@ -1,20 +1,28 @@
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { ApiResponse, createErrorResponse } from '@/lib/apiResponse';
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
     const file = formData.get('file');
-    const productSlug = formData.get('productSlug');
+    const slug = formData.get('productSlug');
 
-    if (!file || !productSlug) {
-      return new Response(JSON.stringify({ error: 'Missing file or productSlug' }), { status: 400 });
+    if (!file || !slug) {
+      return ApiResponse.error('Missing file or productSlug', 'File and slug are required', 400).toResponse();
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const folderPath = path.join(process.cwd(), 'public', 'uploads', 'products', productSlug, 'description_images');
+    const folderPath = path.join(
+      process.cwd(),
+      'public',
+      'uploads',
+      'products',
+      slug,
+      'description_images'
+    );
     await mkdir(folderPath, { recursive: true });
 
     const fileName = `${uuidv4()}_${file.name.replace(/\s+/g, '_')}`;
@@ -22,10 +30,10 @@ export async function POST(req) {
 
     await writeFile(filePath, buffer);
 
-    const fileUrl = `/uploads/products/${productSlug}/description_images/${fileName}`;
-    return new Response(JSON.stringify({ url: fileUrl }), { status: 200 });
+    const fileUrl = `/uploads/products/${slug}/description_images/${fileName}`;
+    return ApiResponse.success({ url: fileUrl }, 'Image uploaded successfully').toResponse();
   } catch (error) {
     console.error('Error uploading description image:', error);
-    return new Response(JSON.stringify({ error: 'Server error while uploading description image' }), { status: 500 });
+    return createErrorResponse(error, 'Unexpected server error while uploading description image');
   }
 }

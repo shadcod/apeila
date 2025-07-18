@@ -1,28 +1,44 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseServerClient } from '@/lib/supabase/server';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function POST(req) {
-  const data = await req.json();
-
   try {
-    const { error } = await supabase
-      .from("products")
-      .insert({
-        ...data,
-        published: false,
-        status: "draft",
-        // Supabase handles createdAt and updatedAt automatically if default values are set in table schema
-      });
+    const body = await req.json();
 
-    if (error) {
-      console.error("Error adding product to Supabase:", error);
-      return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500 });
+    if (!body || typeof body !== 'object') {
+      return Response.json(
+        errorResponse('Invalid request body'),
+        { status: 400 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
-  } catch (error) {
-    console.error("Error adding document:", error);
-    return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500 });
+    const newProduct = {
+      ...body,
+      published: false,
+      status: 'draft', // أو 'pending' إذا كنت تريد مراجعته قبل النشر
+    };
+
+    const supabase = await supabaseServerClient(); // ✅ التهيئة الصحيحة
+
+    const { error } = await supabase.from('products').insert(newProduct);
+
+    if (error) {
+      console.error('❌ Error inserting product:', error.message);
+      return Response.json(
+        errorResponse(error.message),
+        { status: 500 }
+      );
+    }
+
+    return Response.json(
+      successResponse(null, '✅ Product inserted successfully.'),
+      { status: 201 }
+    );
+  } catch (err) {
+    console.error('❌ Server error:', err.message);
+    return Response.json(
+      errorResponse('Internal server error'),
+      { status: 500 }
+    );
   }
 }
-
-

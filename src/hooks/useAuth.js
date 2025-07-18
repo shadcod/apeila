@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 import { toast } from 'react-toastify'
 import {
   signUp,
@@ -75,7 +75,7 @@ export function useAuth() {
     setLoading(true)
     try {
       const newUser = await signUp({ email, password })
-      toast.success('Account created! Please check your email for verification if required.')
+      toast.success('Account created!')
       const redirectTo = await getRedirectAfterLogin('/')
       router.push(redirectTo)
       return newUser
@@ -107,7 +107,7 @@ export function useAuth() {
     setLoading(true)
     try {
       await signOut()
-      toast.info('Logged out successfully.')
+      toast.info('Logged out.')
       router.push('/login')
     } catch (error) {
       toast.error(error.message)
@@ -133,7 +133,7 @@ export function useAuth() {
     setLoading(true)
     try {
       await resetPasswordForEmail(email)
-      toast.success('Password reset email sent! Check your inbox.')
+      toast.success('Password reset email sent!')
     } catch (error) {
       toast.error(error.message)
       throw error
@@ -146,7 +146,7 @@ export function useAuth() {
     setLoading(true)
     try {
       await updatePassword(newPassword)
-      toast.success('Your password has been updated successfully!')
+      toast.success('Password updated!')
       router.push('/login')
     } catch (error) {
       toast.error(error.message)

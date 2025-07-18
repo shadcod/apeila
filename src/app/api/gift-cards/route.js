@@ -1,9 +1,11 @@
-import { supabase } from '@/lib/supabase';
+import { supabaseServerClient } from '@/lib/supabase/server'
 import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export async function GET() {
   try {
+    const supabase = supabaseServerClient();
     const { data, error } = await supabase
+
       .from('giftCards')
       .select('*');
 

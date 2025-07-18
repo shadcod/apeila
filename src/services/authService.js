@@ -2,12 +2,7 @@ import { supabase } from '@/lib/supabase'
 import Cookies from 'js-cookie'
 
 export async function signUp({ email, password }) {
-  const { data, error } = await supabase.auth.signUp(
-    { email, password },
-    {
-      emailRedirectTo: window.location.origin + '/auth/callback',
-    }
-  )
+  const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) throw error
   return data.user
 }
@@ -29,13 +24,10 @@ export async function getCurrentUser() {
 }
 
 export async function signInWithGoogle() {
-  const redirectPath = Cookies.get('redirectAfterLogin') || ''
-  Cookies.remove('redirectAfterLogin')
-
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin + '/auth/callback' + (redirectPath ? `?redirect=${redirectPath}` : ''),
+      redirectTo: window.location.origin + '/auth/callback',
     },
   })
   if (error) throw error

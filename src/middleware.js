@@ -1,44 +1,54 @@
-import { NextResponse } from 'next/server'
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server';
+import { supabaseServerClient } from '@/lib/supabase/server'
+import { createErrorResponse } from '@/lib/apiResponse';
 
 export async function middleware(req) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  const res = NextResponse.next();
 
+  const supabase = supabaseServerClient(req, res);
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+    error: sessionError,
+  } = await supabase.auth.getSession();
 
-  const protectedPaths = ['/dashboard', '/account', '/checkout', '/orders']
-  const isProtected = protectedPaths.some(path => req.nextUrl.pathname.startsWith(path))
+  const url = req.nextUrl;
+  const pathname = url.pathname;
 
-  if (isProtected && !session) {
-    const redirectUrl = new URL('/login', req.url)
-    redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname)
-    return NextResponse.redirect(redirectUrl)
+  const protectedPaths = ['/checkout', '/orders', '/account', '/dashboard'];
+  const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
+
+  if (sessionError) {
+    console.error("Error retrieving session:", sessionError);
+    return createErrorResponse(sessionError, "Authentication error", 401);
   }
 
-  if (isProtected && session) {
-    const { data: profile, error } = await supabase
+  if (isProtected && !session) {
+    const redirectUrl = new URL('/login', req.url);
+    redirectUrl.searchParams.set('redirectedFrom', pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  if (pathname.startsWith('/dashboard') && session) {
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
-      .single()
+      .single();
 
-    if (error || !profile) {
-      const redirectUrl = new URL('/login', req.url)
-      redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname)
-      return NextResponse.redirect(redirectUrl)
+    if (profileError || !profile) {
+      console.error("Error retrieving profile:", profileError);
+      const redirectUrl = new URL('/login', req.url);
+      return NextResponse.redirect(redirectUrl);
     }
 
-    if (req.nextUrl.pathname.startsWith('/dashboard') && profile.role !== 'admin') {
-      return NextResponse.redirect(new URL('/', req.url))
+    if (profile.role !== 'admin') {
+      return NextResponse.redirect(new URL('/', req.url));
     }
   }
 
-  return res
+  return res;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/account/:path*', '/checkout/:path*', '/orders/:path*'],
-}
+  matcher: ['/checkout/:path*', '/orders/:path*', '/account/:path*', '/dashboard/:path*'],
+};

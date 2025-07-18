@@ -1,19 +1,30 @@
-import { supabase } from '@/lib/supabase';
+import { supabaseServerClient } from '@/lib/supabase/server';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
+
+// ✅ دعم CORS
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
 
 export async function POST(req) {
   try {
     const { ids } = await req.json();
 
-    // تحقق من وجود ids وأنها مصفوفة غير فارغة
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-      return new Response(
-        JSON.stringify({ message: 'Invalid or missing IDs' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return Response.json(
+        errorResponse('❌ Invalid or missing IDs. Must be a non-empty array.'),
+        { status: 400 }
       );
     }
+
+    const supabase = await supabaseServerClient(); // ✅ استخدم نسخة السيرفر
 
     const { error } = await supabase
       .from('products')
@@ -21,37 +32,23 @@ export async function POST(req) {
       .in('id', ids);
 
     if (error) {
-      console.error('Error deleting products from Supabase:', error);
-      return new Response(
-        JSON.stringify({ message: 'Failed to delete products', error: error.message }),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
+      console.error('❌ Supabase delete error:', error);
+      return Response.json(
+        errorResponse('❌ Failed to delete products.'),
+        { status: 500 }
       );
     }
 
-    return new Response(
-      JSON.stringify({ message: 'Products deleted successfully' }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+    return Response.json(
+      successResponse(null, '✅ Products deleted successfully.'),
+      { status: 200 }
     );
-  } catch (error) {
-    console.error('Error deleting products:', error);
-    return new Response(
-      JSON.stringify({ message: 'Server error while deleting products' }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+  } catch (err) {
+    console.error('❌ Unexpected server error:', err);
+    return Response.json(
+      errorResponse('❌ Server error while deleting products.'),
+      { status: 500 }
     );
   }
 }
-
 

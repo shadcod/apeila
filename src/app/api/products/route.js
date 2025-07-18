@@ -2,72 +2,87 @@ import fs from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import formidable from 'formidable';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
-// ✅ App Router config
-export const runtime = 'nodejs'; // أو 'edge' لو حابب
-export const dynamic = 'force-dynamic'; // يضمن عدم التخزين المؤقت
+// ✅ Next.js App Router إعدادات خاصة لتفعيل دعم Node.js
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-// دالة مساعدة لإنشاء مجلد إذا لم يكن موجودًا
-async function ensureDirExists(dir) {
+// ✅ تأكد من وجود المجلد المطلوب
+async function ensureDirExists(dirPath) {
   try {
-    await fs.mkdir(dir, { recursive: true });
-  } catch (err) {
-    // إذا المجلد موجود مسبقاً، لا مشكلة
+    await fs.mkdir(dirPath, { recursive: true });
+  } catch (_) {
+    // لا شيء إذا كان موجود
   }
 }
 
-export async function POST(req) {
+// ✅ دالة لتحليل formData من الطلب
+function parseForm(req) {
   return new Promise((resolve, reject) => {
-    const form = new formidable.IncomingForm();
-
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        reject(new Response(JSON.stringify({ error: 'Error parsing form data' }), { status: 500 }));
-        return;
-      }
-
-      try {
-        const productSlug = fields.productSlug || 'default';
-        const file = files.file;
-
-        if (!file) {
-          resolve(new Response(JSON.stringify({ error: 'No file uploaded' }), { status: 400 }));
-          return;
-        }
-
-        // تحديد مسار المجلد الخاص بالمنتج
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', productSlug);
-
-        // مجلدات فرعية حسب نوع الملف (images/videos)
-        const isVideo = file.mimetype.startsWith('video');
-        const subFolder = isVideo ? 'product_videos' : 'product_images';
-
-        const finalDir = path.join(uploadDir, subFolder);
-        await ensureDirExists(finalDir);
-
-        // إنشاء اسم فريد للملف مع المحافظة على الامتداد
-        const ext = path.extname(file.originalFilename);
-        const newFileName = `${uuidv4()}${ext}`;
-        const newFilePath = path.join(finalDir, newFileName);
-
-        // قراءة الملف من المسار المؤقت
-        const data = await fs.readFile(file.filepath);
-
-        // حفظ الملف في المجلد النهائي
-        await fs.writeFile(newFilePath, data);
-
-        // رابط الرفع النهائي للاستخدام في الواجهة
-        const publicUrl = `/uploads/${productSlug}/${subFolder}/${newFileName}`;
-
-        resolve(
-          new Response(JSON.stringify({ url: publicUrl }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        );
-      } catch (error) {
-        reject(new Response(JSON.stringify({ error: 'Failed to save file' }), { status: 500 }));
-      }
+    const form = formidable({
+      multiples: false,
+      keepExtensions: true,
+      maxFileSize: 100 * 1024 * 1024, // 100MB
     });
+
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+  });
+}
+
+// ✅ نقطة نهاية لرفع الملفات
+export async function POST(req) {
+  try {
+    const { fields, files } = await parseForm(req);
+
+    const productSlug =
+      Array.isArray(fields.productSlug) ? fields.productSlug[0] : fields.productSlug || 'default';
+
+    const file =
+      Array.isArray(files.file) ? files.file[0] : files.file;
+
+    if (!file) {
+      return errorResponse('No file uploaded.').toResponse();
+    }
+
+    const isVideo = file.mimetype?.startsWith('video');
+    const isImage = file.mimetype?.startsWith('image');
+
+    if (!isVideo && !isImage) {
+      return errorResponse('Unsupported file type. Only image/video allowed.').toResponse();
+    }
+
+    const folderType = isVideo ? 'product_videos' : 'product_images';
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', productSlug, folderType);
+    await ensureDirExists(uploadDir);
+
+    const ext = path.extname(file.originalFilename || '.file');
+    const newFileName = `${uuidv4()}${ext}`;
+    const newFilePath = path.join(uploadDir, newFileName);
+
+    const fileBuffer = await fs.readFile(file.filepath);
+    await fs.writeFile(newFilePath, fileBuffer);
+
+    const publicUrl = `/uploads/${productSlug}/${folderType}/${newFileName}`;
+
+    return successResponse({ url: publicUrl }, '✅ File uploaded successfully.').toResponse();
+  } catch (error) {
+    console.error('❌ Upload error:', error);
+    return errorResponse('❌ Failed to upload file.').toResponse();
+  }
+}
+
+// ✅ دعم OPTIONS لطلبات CORS (مهم في بعض حالات frontend)
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
   });
 }

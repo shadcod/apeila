@@ -1,23 +1,16 @@
-import { supabase } from '@/lib/supabase';
+import { supabaseServerClient } from '@/lib/supabase/server';
+import { successResponse, errorResponse } from '@/lib/apiResponse';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
   try {
-    if (!req.url) {
-      return new Response(JSON.stringify({ message: 'Missing URL!' }), {
-        status: 400,
-      });
-    }
-
     const { searchParams } = new URL(req.url);
     const slug = searchParams.get('slug');
 
-    if (!slug) {
-      return new Response(JSON.stringify({ message: 'Missing slug!' }), {
-        status: 400,
-      });
-    }
+    if (!slug) return errorResponse('Missing slug', 400);
+
+    const supabase = await supabaseServerClient();
 
     const { data, error } = await supabase
       .from('products')
@@ -25,21 +18,14 @@ export async function GET(req) {
       .eq('slug', slug);
 
     if (error) {
-      console.error('Error checking slug from Supabase:', error);
-      return new Response(JSON.stringify({ message: 'Server error while checking slug' }), {
-        status: 500,
-      });
+      console.error('❌ Error checking slug:', error.message);
+      return errorResponse('Failed to check slug', 500);
     }
 
-    const exists = data.length > 0;
-
-    return new Response(JSON.stringify({ exists }), { status: 200 });
-  } catch (error) {
-    console.error('Error checking slug:', error);
-    return new Response(JSON.stringify({ message: 'Server error while checking slug' }), {
-      status: 500,
-    });
+    const exists = !!data?.length;
+    return successResponse({ exists }, 200);
+  } catch (err) {
+    console.error('❌ Unexpected server error:', err.message);
+    return errorResponse('Internal server error', 500);
   }
 }
-
-

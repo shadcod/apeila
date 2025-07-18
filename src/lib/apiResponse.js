@@ -1,6 +1,5 @@
 // src/lib/apiResponse.js
 
-
 export class ApiResponse {
   constructor(success, data = null, message = '', error = null, statusCode = 200) {
     this.success = success;
@@ -34,6 +33,7 @@ export class ApiResponse {
   }
 }
 
+// ✅ دالة لإنشاء رد خطأ وتسجيله في الـ console
 export const createErrorResponse = (error, message, statusCode = 500) => {
   console.error('API Error:', error);
   return ApiResponse.error(
@@ -41,4 +41,13 @@ export const createErrorResponse = (error, message, statusCode = 500) => {
     message,
     statusCode
   ).toResponse();
+};
+
+// ✅ هذه هي الدوال التي كنت تحاول استيرادها
+export const successResponse = (data, message = 'Operation successful', statusCode = 200) => {
+  return ApiResponse.success(data, message, statusCode).toResponse();
+};
+
+export const errorResponse = (error, message = 'Operation failed', statusCode = 500) => {
+  return ApiResponse.error(error, message, statusCode).toResponse();
 };
