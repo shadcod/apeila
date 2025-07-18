@@ -24,7 +24,8 @@ import {
   FaEye,
 } from 'react-icons/fa';
 
-import { supabase } from '@/lib/supabase';
+import { supabaseClient } from '@/lib/supabase/client'
+
 
 const links = [
   { name: 'Home', path: '/dashboard/home', icon: FaHome, roles: ['admin', 'staff'] },
@@ -59,7 +60,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, userRole = 'admin
   useEffect(() => {
     async function fetchProductCount() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('products')
           .select('id');
 

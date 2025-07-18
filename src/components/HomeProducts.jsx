@@ -1,10 +1,12 @@
 
 'use client';
+
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { supabase } from '@/lib/supabase';
+import { supabaseClient } from '@/lib/supabase/client'
+
 
 const HomeProducts = () => {
   const [products, setProducts] = useState([]);
@@ -13,7 +15,7 @@ const HomeProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('products')
           .select('*');
 

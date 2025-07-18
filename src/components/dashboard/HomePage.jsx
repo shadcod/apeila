@@ -16,7 +16,8 @@ import MostViewedProductsChart from './charts/MostViewedProductsChart';
 import LowStockAlert from './LowStockAlert';
 import ExtraStatsCards from './cards/ExtraStatsCards';
 
-import { supabase } from '@/lib/supabase';
+import { supabaseClient } from '@/lib/supabase/client'
+
 
 export default function HomePage() {
   const [salesData, setSalesData] = useState([]);
@@ -30,7 +31,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const { data: dashboardDataArray, error: dashboardError } = await supabase
+        const { data: dashboardDataArray, error: dashboardError } = await supabaseClient
           .from('dashboard')
           .select('*');
 
@@ -51,7 +52,7 @@ export default function HomePage() {
 
     const fetchProductsData = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('products')
           .select('*');
 
@@ -67,7 +68,7 @@ export default function HomePage() {
 
     const fetchOrdersData = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('orders')
           .select('*');
 
@@ -83,7 +84,7 @@ export default function HomePage() {
 
     const fetchCustomersData = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('customers')
           .select('*');
 

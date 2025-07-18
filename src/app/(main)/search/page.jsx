@@ -4,7 +4,7 @@
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@components/ProductCard';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase'; // تأكد من مسار استدعاء supabase الصحيح
+import { supabaseClient } from '@/lib/supabase/client'
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -17,7 +17,7 @@ export default function SearchPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('products')
           .select('*');
 

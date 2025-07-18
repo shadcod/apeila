@@ -11,7 +11,8 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/autoplay'
 
-import { supabase } from '@/lib/supabase'
+import { supabaseClient } from '@/lib/supabase/client'
+
 
 export default function ProductSlider({ title, category }) {
   const [products, setProducts] = useState([])
@@ -21,7 +22,7 @@ export default function ProductSlider({ title, category }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('products')
           .select('*')
 

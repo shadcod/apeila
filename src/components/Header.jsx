@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAppContext } from '@context/AppContext'
-import { supabase } from '@/lib/supabase'
+import { supabaseClient } from '@/lib/supabase/client'
 import { getCurrentUser, signOut } from '@/services/authService'
 
 export default function Header() {
@@ -56,7 +56,7 @@ export default function Header() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data, error } = await supabase.from('products').select('*')
+        const { data, error } = await supabaseClient.from('products').select('*')
         if (error) throw error
         setProducts(data)
       } catch (error) {
@@ -84,7 +84,7 @@ export default function Header() {
     }
     checkUser()
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null)
     })
 

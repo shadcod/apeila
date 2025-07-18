@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabaseClient } from '@/lib/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function UpdatePasswordPage() {
@@ -15,7 +15,7 @@ export default function UpdatePasswordPage() {
 
   useEffect(() => {
     // Check if there's an access token in the URL (from password reset email)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.access_token) {
         // User is signed in via the reset link, can now update password
         toast.info('You can now set your new password.')

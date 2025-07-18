@@ -5,7 +5,8 @@ import { FaUserCircle, FaBell, FaCog, FaSignOutAlt, FaUser, FaWrench } from 'rea
 import { Tooltip } from 'react-tooltip';
 import Link from 'next/link';
 import { getCurrentUser, signOut } from '@/services/authService';
-import { supabase } from '@/lib/supabase';
+import { supabaseClient } from '@/lib/supabase/client'
+
 
 export default function Topbar({ onToggleSidebar }) {
   const [showMenu, setShowMenu] = useState(false);
@@ -18,7 +19,7 @@ export default function Topbar({ onToggleSidebar }) {
     };
     checkUser();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
